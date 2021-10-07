@@ -1,0 +1,17 @@
+{
+  "name": "gemfab",
+  "version": "0.0.1",
+  "scripts": {
+    "build": "npm run build:sol",
+    "build:sol": "hh compile",
+    "test": "npm run build && ts-mocha test/*"
+  },
+  "devDependencies": {
+    "@nomiclabs/hardhat-ethers": "^2.0.2",
+    "chai-as-promised": "^7.1.1",
+    "debug": "^4.3.2",
+    "dpack": "github:dapphub/dpack",
+    "hardhat": "^2.6.5",
+    "ts-mocha": "^8.0.0"
+  }
+}
