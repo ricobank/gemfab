@@ -37,7 +37,7 @@ contract Ward {
       require(wards[msg.sender], reason);
     }
     modifier auth { 
-      ward('ward-auth');
+      ward('ERR_WARD');
       _;
     }
 }
@@ -90,7 +90,6 @@ contract Gem is Ward {
         ));
     }
 
-    // --- Token ---
     function transfer(address dst, uint wad) public returns (bool) {
         balanceOf[msg.sender] -= wad;
         balanceOf[dst] += wad;
@@ -109,13 +108,13 @@ contract Gem is Ward {
         return true;
     }
     function mint(address usr, uint wad) external {
-        ward('auth-mint');
+        ward('ERR_WARD_MINT');
         balanceOf[usr] += wad;
         totalSupply    += wad;
         emit Transfer(address(0), usr, wad);
     }
     function burn(address usr, uint wad) external {
-        ward('auth-burn');
+        ward('ERR_WARD_BURN');
         balanceOf[usr] -= wad;
         totalSupply    -= wad;
         emit Transfer(usr, address(0), wad);
@@ -126,7 +125,6 @@ contract Gem is Ward {
         return true;
     }
 
-    // --- Alias ---
     function push(address usr, uint wad) external {
         transfer(usr, wad);
     }
@@ -137,7 +135,6 @@ contract Gem is Ward {
         transferFrom(src, dst, wad);
     }
 
-    // --- Approve by signature ---
     // EIP-2612
     function permit(address owner, address spender, uint256 value, uint256 deadline,
                     uint8 v, bytes32 r, bytes32 s) external
@@ -156,8 +153,8 @@ contract Gem is Ward {
                                      deadline))
         ));
         address signer = ecrecover(digest, v, r, s);
-        require(signer != address(0) && owner == signer, "gem-permit-bad-sig");
-        require(block.timestamp <= deadline, "gem-permit-expired");
+        require(signer != address(0) && owner == signer, "ERR_PERMIT_SIG");
+        require(block.timestamp <= deadline, "ERR_PERMIT_TIME");
         allowance[owner][spender] = value;
         emit Approval(owner, spender, value);
     }

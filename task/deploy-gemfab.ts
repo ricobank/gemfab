@@ -19,6 +19,9 @@ task('deploy-gemfab', 'deploy GemFab')
     let gf
 
     await dpack.mutatePackFile(args.dpack, args.dpack, async (mutator: any) => {
+      const GemArtifact = await hre.artifacts.readArtifact('Gem');
+      await mutator.addType(GemArtifact);
+
       const GemFabDeployer = await hre.ethers.getContractFactory('GemFab')
       gf = await GemFabDeployer.deploy()
       await gf.deployed()
@@ -32,9 +35,6 @@ task('deploy-gemfab', 'deploy GemFab')
         network.name,
         GemFabArtifact
       )
-
-      const GemArtifact = await hre.artifacts.readArtifact('Gem');
-      await mutator.addType(GemArtifact);
     })
   })
 
