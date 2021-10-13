@@ -7,15 +7,23 @@
     "build:ts": "tsc",
     "build:sol": "hh compile",
     "pack": "cp dpacks/* dist/dpacks",
-    "test": "npm run build && ts-mocha test/*"
+    "test": "npm run build && { ts-mocha test/*.ts; hh test test/ERC20/*; }"
   },
   "devDependencies": {
     "@nomiclabs/hardhat-ethers": "^2.0.2",
+    "@nomiclabs/hardhat-truffle5": "^2.0.2",
+    "@nomiclabs/hardhat-web3": "^2.0.0",
+    "@openzeppelin/test-helpers": "^0.5.15",
+    "@types/mocha": "^9.0.0",
+    "chai": "^4.3.4",
     "chai-as-promised": "^7.1.1",
     "debug": "^4.3.2",
     "hardhat": "^2.6.5",
+    "hardhat-shorthand": "^1.0.0",
     "ts-mocha": "^8.0.0",
-    "typescript": "^4.4.3"
+    "ts-node": "^10.3.0",
+    "typescript": "^4.4.3",
+    "web3": "^1.6.0"
   },
   "dependencies": {
     "dpack": "github:dapphub/dpack"
