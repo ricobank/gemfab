@@ -16,46 +16,44 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-pragma solidity 0.8.6;
+pragma solidity 0.8.9;
 
 contract Ward {
     mapping (address => bool) public wards;
     event Ward(address indexed caller, address indexed trusts, bool bit);
     constructor() {
-      wards[msg.sender] = true;
-      emit Ward(msg.sender, msg.sender, true);
+        wards[msg.sender] = true;
+        emit Ward(msg.sender, msg.sender, true);
     }
-    function rely(address usr) external auth {
-      emit Ward(msg.sender, usr, true);
-      wards[usr] = true;
+    function rely(address usr) external {
+        ward('ERR_WARD_RELY');
+        emit Ward(msg.sender, usr, true);
+        wards[usr] = true;
     }
-    function deny(address usr) external auth {
-      emit Ward(msg.sender, usr, false);
-      wards[usr] = false;
+    function deny(address usr) external {
+        ward('ERR_WARD_DENY');
+        emit Ward(msg.sender, usr, false);
+        wards[usr] = false;
     }
     function ward(string memory reason) internal view {
-      require(wards[msg.sender], reason);
-    }
-    modifier auth { 
-      ward('ERR_WARD');
-      _;
+        require(wards[msg.sender], reason);
     }
 }
 
 contract GemFab {
-  mapping(address=>uint) public built;
-  event Build(address indexed caller, address indexed gem);
-  function build(
-    string memory name,
-    string memory symbol
-  ) public returns (Gem gem) {
-    gem = new Gem(name, symbol);
-    gem.rely(msg.sender);
-    gem.deny(address(this));
-    built[address(gem)] = block.timestamp;
-    emit Build(msg.sender, address(gem));
-    return gem;
-  }
+    mapping(address=>uint) public built;
+    event Build(address indexed caller, address indexed gem);
+    function build(
+      string memory name,
+      string memory symbol
+    ) public returns (Gem gem) {
+        gem = new Gem(name, symbol);
+        gem.rely(msg.sender);
+        gem.deny(address(this));
+        built[address(gem)] = block.timestamp;
+        emit Build(msg.sender, address(gem));
+        return gem;
+    }
 }
 
 contract Gem is Ward {
@@ -72,7 +70,7 @@ contract Gem is Ward {
 
     bytes32 public constant PERMIT_TYPEHASH = 0x6e71edae12b1b97f4d1f60370fef10105fa2faae0126114a169c64845d6126c9;
     // = keccak256('Permit(address owner,address spender,uint256 value,uint256 nonce,uint256 deadline)');
-    bytes32 public DOMAIN_SEPARATOR;
+    bytes32 public immutable DOMAIN_SEPARATOR;
 
     event Approval(address indexed src, address indexed usr, uint wad);
     event Transfer(address indexed src, address indexed dst, uint wad);

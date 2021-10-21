@@ -45,7 +45,7 @@ describe('gemfab', ()=>{
     want(bal.toNumber()).equal(100)
 
     const gembob = gem.connect(bob);
-    await fail('auth-mint', gembob.mint, BOB, 100);
+    await fail('ERR_WARD_MINT', gembob.mint, BOB, 100);
   })
 
 });
