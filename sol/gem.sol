@@ -79,7 +79,8 @@ contract Gem is Warded {
         DOMAIN_SEPARATOR = keccak256(abi.encode(
             0x8b73c3c69bb8fe3d512ecc4cf759cc79239f7b179b0ffacaa9a75d522b39400f,
               //= keccak256("EIP712Domain(string name,string version,uint256 chainId,address verifyingContract)"),
-            keccak256(bytes(name)),
+            0x7e93b3de711138b10fadfa22024b96a0a3a08f812d3afdf331786949e62c5c5a,
+              //= keccak256("GemPermit"),  //bytes(name)),
             0xc5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470, 
               //= keccak256(bytes("0")),    // TODO gas regression test
             block.chainid,
@@ -138,16 +139,17 @@ contract Gem is Warded {
     {
         uint nonce = nonces[owner];
         nonces[owner]++;
-        bytes32 digest =
-            keccak256(abi.encodePacked(
-                "\x19\x01",
-                DOMAIN_SEPARATOR,
-                keccak256(abi.encode(PERMIT_TYPEHASH,
-                                     owner,
-                                     spender,
-                                     value,
-                                     nonce,
-                                     deadline))
+        bytes32 digest = keccak256(abi.encodePacked(
+            "\x19\x01",
+            DOMAIN_SEPARATOR,
+            keccak256(abi.encode(
+                PERMIT_TYPEHASH,
+                owner,
+                spender,
+                value,
+                nonce,
+                deadline
+            ))
         ));
         address signer = ecrecover(digest, v, r, s);
         require(signer != address(0) && owner == signer, "ERR_PERMIT_SIG");

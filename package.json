@@ -7,7 +7,8 @@
     "build:ts": "tsc",
     "build:sol": "hh compile",
     "pack": "cp dpacks/* dist/dpacks",
-    "test": "npm run build && ts-mocha test/*"
+    "test": "npm run build && ts-mocha test/*",
+    "fmt": "ts-standard --fix task test index.ts"
   },
   "devDependencies": {
     "@nomiclabs/hardhat-ethers": "^2.0.2",
@@ -15,9 +16,11 @@
     "debug": "^4.3.2",
     "hardhat": "^2.6.5",
     "ts-mocha": "^8.0.0",
+    "ts-standard": "^10.0.0",
     "typescript": "^4.4.3"
   },
   "dependencies": {
-    "dpack": "github:dapphub/dpack"
+    "dpack": "github:dapphub/dpack",
+    "ethers-eip712": "^0.2.0"
   }
 }
