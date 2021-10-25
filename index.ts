@@ -1,15 +1,6 @@
 import * as path from 'path'
-import * as dpack from 'dpack'
 
 import { TypedDataUtils } from 'ethers-eip712'
-
-export let dapp
-
-export async function init () {
-  console.log('WARN loading dpack from file')
-  const packfile = path.join(__dirname, './dpacks/gemfab.json')
-  dapp = await dpack.loadFromFile(packfile)
-}
 
 // obj: {
 //   chainId: u256,

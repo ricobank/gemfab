@@ -6,6 +6,9 @@ const want = chai.expect
 
 const { ethers, artifacts, network } = require('hardhat')
 
+const pkg = require('..')
+debug(pkg)
+
 async function send(...args) {
   const f = args[0];
   const fargs = args.slice(1);
