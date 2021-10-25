@@ -18,7 +18,7 @@
 
 pragma solidity 0.8.9;
 
-contract Ward {
+contract Warded {
     mapping (address => bool) public wards;
     event Ward(address indexed caller, address indexed trusts, bool bit);
     constructor() {
@@ -26,17 +26,17 @@ contract Ward {
         emit Ward(msg.sender, msg.sender, true);
     }
     function rely(address usr) external {
-        ward('ERR_WARD_RELY');
+        ward();
         emit Ward(msg.sender, usr, true);
         wards[usr] = true;
     }
     function deny(address usr) external {
-        ward('ERR_WARD_DENY');
+        ward();
         emit Ward(msg.sender, usr, false);
         wards[usr] = false;
     }
-    function ward(string memory reason) internal view {
-        require(wards[msg.sender], reason);
+    function ward() internal view {
+        require(wards[msg.sender], 'ERR_WARD');
     }
 }
 
@@ -56,21 +56,19 @@ contract GemFab {
     }
 }
 
-contract Gem is Ward {
+contract Gem is Warded {
     string  public name;
     string  public symbol;
     uint256 public totalSupply;
     uint8   public constant decimals = 18;
 
-    uint256 public chainId;
-
     mapping (address => uint)                      public balanceOf;
     mapping (address => mapping (address => uint)) public allowance;
     mapping (address => uint)                      public nonces;
 
-    bytes32 public constant PERMIT_TYPEHASH = 0x6e71edae12b1b97f4d1f60370fef10105fa2faae0126114a169c64845d6126c9;
-    // = keccak256('Permit(address owner,address spender,uint256 value,uint256 nonce,uint256 deadline)');
     bytes32 public immutable DOMAIN_SEPARATOR;
+    bytes32 public constant  PERMIT_TYPEHASH = 0x6e71edae12b1b97f4d1f60370fef10105fa2faae0126114a169c64845d6126c9;
+      //= keccak256('Permit(address owner,address spender,uint256 value,uint256 nonce,uint256 deadline)');
 
     event Approval(address indexed src, address indexed usr, uint wad);
     event Transfer(address indexed src, address indexed dst, uint wad);
@@ -78,12 +76,13 @@ contract Gem is Ward {
     constructor(string memory name_, string memory symbol_) {
         name = name_;
         symbol = symbol_;
-        chainId = block.chainid;
         DOMAIN_SEPARATOR = keccak256(abi.encode(
-            keccak256("EIP712Domain(string name,string version,uint256 chainId,address verifyingContract)"),
+            0x8b73c3c69bb8fe3d512ecc4cf759cc79239f7b179b0ffacaa9a75d522b39400f,
+              //= keccak256("EIP712Domain(string name,string version,uint256 chainId,address verifyingContract)"),
             keccak256(bytes(name)),
-            keccak256(bytes("0")),
-            chainId,
+            0xc5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470, 
+              //= keccak256(bytes("0")),    // TODO gas regression test
+            block.chainid,
             address(this)
         ));
     }
@@ -106,13 +105,13 @@ contract Gem is Ward {
         return true;
     }
     function mint(address usr, uint wad) external {
-        ward('ERR_WARD_MINT');
+        ward();
         balanceOf[usr] += wad;
         totalSupply    += wad;
         emit Transfer(address(0), usr, wad);
     }
     function burn(address usr, uint wad) external {
-        ward('ERR_WARD_BURN');
+        ward();
         balanceOf[usr] -= wad;
         totalSupply    -= wad;
         emit Transfer(usr, address(0), wad);

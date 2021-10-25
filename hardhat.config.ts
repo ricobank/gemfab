@@ -15,7 +15,7 @@ export default {
   solidity: '0.8.9',
   defaultNetwork: 'hardhat',
   paths: {
-    sources: "./src"
+    sources: "./sol"
   },
   networks: {
     hardhat: {},

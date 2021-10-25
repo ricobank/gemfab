@@ -29,8 +29,8 @@ describe('gemfab', ()=>{
   before(async()=>{
     [ali, bob, cat] = await ethers.getSigners();
     [ALI, BOB, CAT] = [ali, bob, cat].map(signer => signer.address);
-    gem_type = await ethers.getContractFactory('./src/gem.sol:Gem', ali);
-    gemfab_type = await ethers.getContractFactory('./src/gem.sol:GemFab', ali);
+    gem_type = await ethers.getContractFactory('Gem', ali);
+    gemfab_type = await ethers.getContractFactory('GemFab', ali);
   })
   beforeEach(async() => {
     gemfab = await gemfab_type.deploy();
@@ -45,7 +45,7 @@ describe('gemfab', ()=>{
     want(bal.toNumber()).equal(100)
 
     const gembob = gem.connect(bob);
-    await fail('ERR_WARD_MINT', gembob.mint, BOB, 100);
+    await fail('ERR_WARD', gembob.mint, BOB, 100);
   })
 
 });
