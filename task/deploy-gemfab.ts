@@ -12,9 +12,9 @@ task('deploy-gemfab', 'deploy GemFab')
 
     debug(`Deploying contracts using ${deployer} to ${network.name}`)
 
-    const GemArtifact = await hre.artifacts.readArtifact('Gem')
-    const GemFabArtifact = await hre.artifacts.readArtifact('GemFab')
-    const GemFabDeployer = await hre.ethers.getContractFactory('GemFab')
+    const GemArtifact = require('../artifacts/sol/gem.sol/Gem.json')//await hre.artifacts.readArtifact('Gem')
+    const GemFabArtifact = require('../artifacts/sol/gem.sol/GemFab.json')//await hre.artifacts.readArtifact('GemFab')
+    const GemFabDeployer = new hre.ethers.ContractFactory(GemFabArtifact.abi, GemFabArtifact.bytecode, acct)//await hre.ethers.getContractFactory('GemFab')
     const gf = await GemFabDeployer.deploy()
     await gf.deployed()
     debug('GemFab deployed to : ', gf.address)

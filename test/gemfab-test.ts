@@ -22,7 +22,7 @@ async function fail(...args) {
   const err = args[0];
   const sargs = args.slice(1);
   await want(send(...sargs)).rejectedWith(
-    `VM Exception while processing transaction: reverted with reason string '${err}'`
+    `VM Exception while processing transaction: reverted with custom error '${err}'`
   );
 }
 
@@ -55,7 +55,7 @@ describe('gemfab', ()=>{
     want(bal.toNumber()).equal(100)
 
     const gembob = gem.connect(bob);
-    await fail('ERR_WARD', gembob.mint, BOB, 100);
+    await fail('ErrWard("0x40c10f19")', gembob.mint, BOB, 100);
   })
 
 });

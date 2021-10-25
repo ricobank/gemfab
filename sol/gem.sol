@@ -20,23 +20,24 @@ pragma solidity 0.8.9;
 
 contract Warded {
     mapping (address => bool) public wards;
-    event Ward(address indexed caller, address indexed trusts, bool bit);
+    event SetWard(address indexed caller, address indexed trusts, bool bit);
+    error ErrWard(bytes4 sig);
     constructor() {
         wards[msg.sender] = true;
-        emit Ward(msg.sender, msg.sender, true);
+        emit SetWard(msg.sender, msg.sender, true);
     }
     function rely(address usr) external {
         ward();
-        emit Ward(msg.sender, usr, true);
+        emit SetWard(msg.sender, usr, true);
         wards[usr] = true;
     }
     function deny(address usr) external {
         ward();
-        emit Ward(msg.sender, usr, false);
+        emit SetWard(msg.sender, usr, false);
         wards[usr] = false;
     }
     function ward() internal view {
-        require(wards[msg.sender], 'ERR_WARD');
+        if (!wards[msg.sender]) revert ErrWard(msg.sig);
     }
 }
 
@@ -72,6 +73,9 @@ contract Gem is Warded {
 
     event Approval(address indexed src, address indexed usr, uint wad);
     event Transfer(address indexed src, address indexed dst, uint wad);
+
+    error ErrPermitSig();
+    error ErrPermitTime();
 
     constructor(string memory name_, string memory symbol_) {
         name = name_;
@@ -152,8 +156,8 @@ contract Gem is Warded {
             ))
         ));
         address signer = ecrecover(digest, v, r, s);
-        require(signer != address(0) && owner == signer, "ERR_PERMIT_SIG");
-        require(block.timestamp <= deadline, "ERR_PERMIT_TIME");
+        if (!(signer != address(0) && owner == signer)) revert ErrPermitSig();
+        if (!(block.timestamp <= deadline)) revert ErrPermitTime();
         allowance[owner][spender] = value;
         emit Approval(owner, spender, value);
     }
