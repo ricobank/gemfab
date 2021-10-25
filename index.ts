@@ -1,5 +1,3 @@
-import * as path from 'path'
-
 import { TypedDataUtils } from 'ethers-eip712'
 
 // obj: {
@@ -11,7 +9,7 @@ import { TypedDataUtils } from 'ethers-eip712'
 //   nonce: u256,
 //   deadline: u256,
 // }
-export async function makeGemPermitDigest (obj: any) {
+export function makeGemPermitDigest (obj: any) {
   const typedData = {
     types: {
       EIP712Domain: [

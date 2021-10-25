@@ -1,41 +1,48 @@
 const debug = require('debug')('gemfab:task')
 
-const dpack = require('dpack')
-
 const { task } = require('hardhat/config')
 
 task('deploy-gemfab', 'deploy GemFab')
-  .addParam('dpack', 'output path for dpack')
+  .addOptionalParam('outfile', 'output file to save export json')
   .setAction(async (args, hre) => {
     const { ethers, network } = hre
 
     const [acct] = await hre.ethers.getSigners()
     const deployer = acct.address
 
-    console.log(`Deploying contracts using ${deployer} to ${network.name}`)
+    debug(`Deploying contracts using ${deployer} to ${network.name}`)
 
-    await dpack.initPackFile(args.dpack)
+    const GemArtifact = await hre.artifacts.readArtifact('Gem')
+    const GemFabArtifact = await hre.artifacts.readArtifact('GemFab')
+    const GemFabDeployer = await hre.ethers.getContractFactory('GemFab')
+    const gf = await GemFabDeployer.deploy()
+    await gf.deployed()
+    debug('GemFab deployed to : ', gf.address)
 
-    let gf
+    const out = { types: {}, objects: {} }
+    out.types.Gem = {
+      typename: 'Gem',
+      artifact: GemArtifact
+    }
+    out.types.GemFab = {
+      typename: 'GemFab',
+      artifact: GemFabArtifact
+    }
+    out.objects.gemfab = {
+      name: 'gemfab',
+      typename: 'GemFab',
+      artifact: GemFabArtifact,
+      address: gf.address
+    }
+    const json = JSON.stringify(out)
 
-    await dpack.mutatePackFile(args.dpack, args.dpack, async (mutator: any) => {
-      const GemArtifact = await hre.artifacts.readArtifact('Gem')
-      await mutator.addType(GemArtifact)
-
-      const GemFabDeployer = await hre.ethers.getContractFactory('GemFab')
-      gf = await GemFabDeployer.deploy()
-      await gf.deployed()
-      console.log('GemFab deployed to : ', gf.address)
-      const GemFabArtifact = await hre.artifacts.readArtifact('GemFab')
-
-      await mutator.addType(GemFabArtifact)
-      await mutator.addObject(
-        'gemfab',
-        gf.address,
-        network.name,
-        GemFabArtifact
-      )
-    })
+    debug('WARN force writing file -- uprade to dpack later')
+    if (args.outfile) {
+      const fs = require('fs')
+      fs.writeFileSync(args.outfile, json)
+    } else {
+      console.log(json)
+    }
   })
 
 export {}
