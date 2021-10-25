@@ -6,6 +6,8 @@ const want = chai.expect
 
 const { ethers, artifacts, network } = require('hardhat')
 
+import * as hre from 'hardhat'
+
 const pkg = require('..')
 debug(pkg)
 
@@ -40,6 +42,11 @@ describe('gemfab', ()=>{
     const gemaddr = await gemfab.callStatic.build("Mock Cash", "CASH");
     await send(gemfab.build, "Mock Cash", "CASH");
     gem = gem_type.attach(gemaddr);
+  })
+
+  it('fixture', async () => {
+    await hre.deployments.fixture(['gemfab']);
+    debug(Object.keys(hre.deployments));
   })
 
   it('mint ward', async () => {

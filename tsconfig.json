@@ -6,6 +6,7 @@
   "include": [
     "src/**/*.ts",
     "task/**/*.ts",
+    "deploy/**/*.ts",
     "index.ts",
     "hardhat.config.ts"
   ]
