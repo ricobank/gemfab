@@ -2,7 +2,7 @@ const debug = require('debug')('gemfab:task')
 
 const { task } = require('hardhat/config')
 
-const t = task('deploy-gemfab', 'deploy GemFab')
+task('deploy-gemfab', 'deploy GemFab')
   .addOptionalParam('outfile', 'output file to save export json')
   .setAction(async (args, hre) => {
     const { ethers, network } = hre
@@ -44,5 +44,3 @@ const t = task('deploy-gemfab', 'deploy GemFab')
       console.log(json)
     }
   })
-
-export default t

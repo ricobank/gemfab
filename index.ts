@@ -1,7 +1,5 @@
 import { TypedDataUtils } from 'ethers-eip712'
 
-export const deploy = require('./task/deploy-gemfab')
-
 // obj: {
 //   chainId: u256,
 //   gem: address,
