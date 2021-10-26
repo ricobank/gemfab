@@ -131,16 +131,16 @@ contract Gem is Warded {
 }
 
 contract GemFab {
-    mapping(address=>uint) public built;
+    mapping(address=>bool) public built;
 
-    event Build(address indexed caller, address indexed gem);
+    event Build(address indexed caller, address indexed gem, string indexed symbol);
 
     function build(string memory name, string memory symbol) public returns (Gem gem) {
         gem = new Gem(name, symbol);
         gem.rely(msg.sender);
         gem.deny(address(this));
-        built[address(gem)] = block.timestamp;
-        emit Build(msg.sender, address(gem));
+        built[address(gem)] = true;
+        emit Build(msg.sender, address(gem), symbol);
         return gem;
     }
 }
