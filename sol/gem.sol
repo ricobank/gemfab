@@ -18,30 +18,7 @@
 
 pragma solidity 0.8.9;
 
-abstract contract Warded {
-    mapping (address => bool) public wards;
-    event LogWard(address indexed caller, address indexed trusts, bool bit);
-    error ErrWard();
-    constructor() {
-        wards[msg.sender] = true;
-        emit LogWard(msg.sender, msg.sender, true);
-    }
-    function rely(address usr) external {
-        ward();
-        emit LogWard(msg.sender, usr, true);
-        wards[usr] = true;
-    }
-    function deny(address usr) external {
-        ward();
-        emit LogWard(msg.sender, usr, false);
-        wards[usr] = false;
-    }
-    function ward() internal view {
-        if (!wards[msg.sender]) {
-            revert ErrWard();
-        }
-    }
-}
+import { Warded } from './pkg/ward/ward.sol';
 
 contract Gem is Warded {
     string  public name;

@@ -1,0 +1,3 @@
+[submodule "sol/pkg/ward"]
+	path = sol/pkg/ward
+	url = https://github.com/ethsys/ward
