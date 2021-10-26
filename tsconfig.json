@@ -2,12 +2,5 @@
   "compilerOptions": {
     "outDir": "dist",
     "esModuleInterop": true
-  },
-  "include": [
-    "src/**/*.ts",
-    "task/**/*.ts",
-    "deploy/**/*.ts",
-    "index.ts",
-    "hardhat.config.ts"
-  ]
+  }
 }
