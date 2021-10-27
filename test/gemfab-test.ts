@@ -1,6 +1,6 @@
 import * as hh from 'hardhat'
 import { ethers, artifacts, network } from 'hardhat'
-import { want, send, failRevert, snapshot, revert } from 'minihat'
+import { want, send, fail, snapshot, revert } from 'minihat'
 
 const debug = require('debug')('gemfab:test')
 
@@ -32,6 +32,6 @@ describe('gemfab', () => {
     want(bal.toNumber()).equal(100)
 
     const gembob = gem.connect(bob)
-    await failRevert('ErrWard()', gembob.mint, BOB, 100)
+    await fail('ErrWard()', gembob.mint, BOB, 100)
   })
 })
