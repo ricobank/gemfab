@@ -72,6 +72,7 @@ function shouldBehaveLikeERC20 (errorPrefix, initialSupply, initialHolder, recip
               });
             });
 
+            /* // not required for EIP20
             it('emits an approval event', async function () {
               const { logs } = await this.token.transferFrom(tokenOwner, to, amount, { from: spender });
 
@@ -81,6 +82,7 @@ function shouldBehaveLikeERC20 (errorPrefix, initialSupply, initialHolder, recip
                 wad: await this.token.allowance(tokenOwner, spender),
               });
             });
+            */
           });
 
           describe('when the token owner does not have enough balance', function () {
@@ -88,7 +90,7 @@ function shouldBehaveLikeERC20 (errorPrefix, initialSupply, initialHolder, recip
 
             it('reverts', async function () {
               await expectRevert(this.token.transferFrom(
-                tokenOwner, to, amount, { from: spender }), `VM Exception while processing transaction: revert GEM/insufficient-balance`,
+                tokenOwner, to, amount, { from: spender }), `underflow`,
               );
             });
           });
@@ -104,7 +106,7 @@ function shouldBehaveLikeERC20 (errorPrefix, initialSupply, initialHolder, recip
 
             it('reverts', async function () {
               await expectRevert(this.token.transferFrom(
-                tokenOwner, to, amount, { from: spender }), `VM Exception while processing transaction: revert GEM/insufficient-allowance`,
+                tokenOwner, to, amount, { from: spender }), `underflow`,
               );
             });
           });
@@ -114,13 +116,14 @@ function shouldBehaveLikeERC20 (errorPrefix, initialSupply, initialHolder, recip
 
             it('reverts', async function () {
               await expectRevert(this.token.transferFrom(
-                tokenOwner, to, amount, { from: spender }), `VM Exception while processing transaction: revert GEM/insufficient-balance`,
+                tokenOwner, to, amount, { from: spender }), `underflow`,
               );
             });
           });
         });
       });
 
+      /*
       describe('when the recipient is the zero address', function () {
         const amount = initialSupply;
         const to = ZERO_ADDRESS;
@@ -135,8 +138,10 @@ function shouldBehaveLikeERC20 (errorPrefix, initialSupply, initialHolder, recip
           );
         });
       });
+      */
     });
 
+    /*
     describe('when the token owner is the zero address', function () {
       const amount = 0;
       const tokenOwner = ZERO_ADDRESS;
@@ -148,6 +153,7 @@ function shouldBehaveLikeERC20 (errorPrefix, initialSupply, initialHolder, recip
         );
       });
     });
+    */
   });
 
   describe('approve', function () {
@@ -165,8 +171,7 @@ function shouldBehaveLikeERC20Transfer (errorPrefix, from, to, balance, transfer
       const amount = balance.addn(1);
 
       it('reverts', async function () {
-        await expectRevert(transfer.call(this, from, to, amount),
-          `VM Exception while processing transaction: revert GEM/insufficient-balance`,
+        await expectRevert(transfer.call(this, from, to, amount), `underflow`,
         );
       });
     });
@@ -216,6 +221,7 @@ function shouldBehaveLikeERC20Transfer (errorPrefix, from, to, balance, transfer
     });
   });
 
+  /*
   describe('when the recipient is the zero address', function () {
     it('reverts', async function () {
       await expectRevert(transfer.call(this, from, ZERO_ADDRESS, balance),
@@ -223,6 +229,7 @@ function shouldBehaveLikeERC20Transfer (errorPrefix, from, to, balance, transfer
       );
     });
   });
+  */
 }
 
 function shouldBehaveLikeERC20Approve (errorPrefix, owner, spender, supply, approve) {
@@ -296,6 +303,7 @@ function shouldBehaveLikeERC20Approve (errorPrefix, owner, spender, supply, appr
     });
   });
 
+  /*
   describe('when the spender is the zero address', function () {
     it('reverts', async function () {
       await expectRevert(approve.call(this, owner, ZERO_ADDRESS, supply),
@@ -303,6 +311,7 @@ function shouldBehaveLikeERC20Approve (errorPrefix, owner, spender, supply, appr
       );
     });
   });
+  */
 }
 
 module.exports = {

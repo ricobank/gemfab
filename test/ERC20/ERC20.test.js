@@ -69,12 +69,14 @@ contract('ERC20', function (accounts) {
 
 
       function shouldDecreaseApproval (amount) {
+        /* // no decreaseAllowance contract method
         describe('when there was no approved amount before', function () {
           it('reverts', async function () {
             await expectRevert(decreaseAllowance(this.token, initialHolder, spender, amount), 'GEM/allowance underflow.',
             );
           });
         });
+        */
 
         describe('when the spender had an approved amount', function () {
           const approvedAmount = amount;
@@ -104,12 +106,14 @@ contract('ERC20', function (accounts) {
             expect(await this.token.allowance(initialHolder, spender)).to.be.bignumber.equal('0');
           });
 
+          /* // no decreaseAllowance contract method
           it('reverts when more than the full allowance is removed', async function () {
             await expectRevert(
               decreaseAllowance(this.token, initialHolder, spender, approvedAmount.addn(1), { from: initialHolder }),
               'Reverted, check reason',
             );
           });
+          */
         });
       }
 
@@ -126,6 +130,7 @@ contract('ERC20', function (accounts) {
       });
     });
 
+    /* // null checks not part of spec
     describe('when the spender is the zero address', function () {
       const amount = initialSupply;
       const spender = ZERO_ADDRESS;
@@ -136,6 +141,7 @@ contract('ERC20', function (accounts) {
         );
       });
     });
+    */
   });
 
   describe('increase allowance', function () {
@@ -211,6 +217,7 @@ contract('ERC20', function (accounts) {
       });
     });
 
+    /* // null checks not part of spec
     describe('when the spender is the zero address', function () {
       const spender = ZERO_ADDRESS;
 
@@ -220,15 +227,18 @@ contract('ERC20', function (accounts) {
         );
       });
     });
+    */
   });
 
   describe('_mint', function () {
     const amount = new BN(50);
+    /* // null checks not part of spec
     it('rejects a null account', async function () {
       await expectRevert(
         this.token.mint(ZERO_ADDRESS, amount), 'VM Exception while processing transaction: revert unimplemented',
       );
     });
+    */
 
     describe('for a non zero account', function () {
       beforeEach('minting', async function () {
@@ -257,15 +267,17 @@ contract('ERC20', function (accounts) {
   });
 
   describe('_burn', function () {
+    /* // null checks not part of spec
     it('rejects a null account', async function () {
       await expectRevert(this.token.burn(ZERO_ADDRESS, new BN(1)),
         'ERC20: burn from the zero address');
     });
+    */
 
     describe('for a non zero account', function () {
       it('rejects burning more than balance', async function () {
         await expectRevert(this.token.burn(
-          initialHolder, initialSupply.addn(1)), 'VM Exception while processing transaction: revert GEM/insufficient-balance',
+          initialHolder, initialSupply.addn(1)), 'underflow',
         );
       });
 
