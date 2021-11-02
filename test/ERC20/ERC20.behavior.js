@@ -1,3 +1,10 @@
+// modified version of openzeppelin-contracts ERC20.behavior.js
+//   https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/test/token/ERC20/ERC20.behavior.js
+//
+// The MIT License (MIT)
+// Copyright (c) 2016-2020 zOS Global Limited
+// https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/LICENSE
+
 const { BN, constants, expectEvent, expectRevert } = require('@openzeppelin/test-helpers');
 const { expect } = require('chai');
 const { ZERO_ADDRESS } = constants;
