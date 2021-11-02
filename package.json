@@ -8,7 +8,7 @@
     "build:ts": "tsc",
     "build:sol": "hh compile",
     "pretest": "npm run build",
-    "test": "ts-mocha test/*",
+    "test": "ts-mocha test/*.ts && hh test test/ERC20/*.js",
     "fmt": "ts-standard --fix task test index.ts"
   },
   "devDependencies": {
