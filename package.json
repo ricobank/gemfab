@@ -8,7 +8,7 @@
     "build:ts": "tsc",
     "build:sol": "hh compile",
     "pretest": "npm run build",
-    "test": "ts-mocha test/*.ts && hh test test/ERC20/*.js",
+    "test": "{ ts-mocha test/*.ts; hh test test/ERC20/*; }",
     "fmt": "ts-standard --fix task test index.ts"
   },
   "devDependencies": {
@@ -20,7 +20,14 @@
     "minihat": "^0.0.4",
     "ts-mocha": "^8.0.0",
     "ts-standard": "^10.0.0",
-    "typescript": "^4.4.3"
+    "typescript": "^4.4.3",
+    "@nomiclabs/hardhat-truffle5": "^2.0.2",
+    "@nomiclabs/hardhat-web3": "^2.0.0",
+    "@openzeppelin/test-helpers": "^0.5.15",
+    "@types/mocha": "^9.0.0",
+    "hardhat-shorthand": "^1.0.0",
+    "ts-node": "^10.3.0",
+    "web3": "^1.6.0"
   },
   "dependencies": {
     "ethers-eip712": "^0.2.0"
