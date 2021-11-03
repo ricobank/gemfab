@@ -1,4 +1,6 @@
 import '@nomiclabs/hardhat-ethers'
+import "@nomiclabs/hardhat-web3";
+import "@nomiclabs/hardhat-truffle5";
 
 import './task/deploy-gemfab'
 
