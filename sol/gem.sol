@@ -18,7 +18,27 @@
 
 pragma solidity 0.8.9;
 
-import { Warded } from './pkg/ward/ward.sol';
+abstract contract Warded {
+    mapping (address => bool) public wards;
+    event Ward(address indexed caller, address indexed trusts, bool bit);
+    error ErrAuth(bytes4 sig);
+    constructor() {
+        wards[msg.sender] = true;
+        emit Ward(msg.sender, msg.sender, true);
+    }
+    function rely(address usr) external auth {
+        wards[usr] = true;
+        emit Ward(msg.sender, usr, true);
+    }
+    function deny(address usr) external {
+        wards[usr] = false;
+        emit Ward(msg.sender, usr, false);
+    }
+    modifier auth() {
+        if (!wards[msg.sender]) revert ErrAuth(msg.sig);
+        _;
+    }
+}
 
 contract Gem is Warded {
     string  public name;
@@ -50,6 +70,9 @@ contract Gem is Warded {
     constructor(string memory name_, string memory symbol_) {
         name = name_;
         symbol = symbol_;
+
+        wards[msg.sender] = true;
+        emit Ward(msg.sender, msg.sender, true);
     }
 
     function transfer(address dst, uint wad) external returns (bool) {
@@ -71,15 +94,13 @@ contract Gem is Warded {
         return true;
     }
 
-    function mint(address usr, uint wad) external {
-        ward();
+    function mint(address usr, uint wad) external auth {
         balanceOf[usr] += wad;
         totalSupply    += wad;
         emit Transfer(address(0), usr, wad);
     }
 
-    function burn(address usr, uint wad) external {
-        ward();
+    function burn(address usr, uint wad) external auth {
         balanceOf[usr] -= wad;
         totalSupply    -= wad;
         emit Transfer(usr, address(0), wad);
@@ -105,6 +126,7 @@ contract Gem is Warded {
         allowance[owner][spender] = value;
         emit Approval(owner, spender, value);
     }
+
 }
 
 contract GemFab {
