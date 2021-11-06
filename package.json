@@ -20,6 +20,7 @@
     "chai-as-promised": "^7.1.1",
     "debug": "^4.3.2",
     "ethereumjs-wallet": "^1.0.2",
+    "ethers": ">=5.4.7 <5.5.0",
     "hardhat": "^2.6.5",
     "hardhat-deploy": "^0.9.4",
     "hardhat-shorthand": "^1.0.0",
