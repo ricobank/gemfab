@@ -32,6 +32,6 @@ describe('gemfab', () => {
     want(bal.toNumber()).equal(100)
 
     const gembob = gem.connect(bob)
-    await fail('ErrWard()', gembob.mint, BOB, 100)
+    await fail('ErrAuth', gembob.mint, BOB, 100)
   })
 })
