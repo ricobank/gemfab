@@ -2,9 +2,14 @@ import * as hh from 'hardhat'
 import { ethers, artifacts, network } from 'hardhat'
 import { want, send, fail, snapshot, revert } from 'minihat'
 
+import { TypedDataUtils } from 'ethers-eip712'
+
+
+
 const debug = require('debug')('gemfab:test')
 
 describe('gemfab', () => {
+  let chainId;
   let ali, bob, cat
   let ALI, BOB, CAT
   let gem; let gem_type
@@ -21,6 +26,8 @@ describe('gemfab', () => {
     gem = gem_type.attach(gemaddr)
 
     await snapshot(hh)
+
+    chainId = await hh.web3.eth.getChainId();
   })
   beforeEach(async () => {
     await revert(hh)
@@ -34,4 +41,100 @@ describe('gemfab', () => {
     const gembob = gem.connect(bob)
     await fail('ErrAuth', gembob.mint, BOB, 100)
   })
+
+  describe('gas cost', () => {
+    let gas, maxGas, minGas;
+    afterEach(async () => {
+      await want(gas.toNumber()).to.be.at.most(maxGas);
+      if( gas.toNumber() < minGas ) {
+        console.log("gas reduction: previous min=", minGas, " gas used=", gas.toNumber());
+      }
+    });
+
+    it('mint', async () => {
+      gas    = await gem.estimateGas.mint(ALI, 100);
+      maxGas = 71222;
+      minGas = 71222;
+    });
+
+    it('transfer', async () => {
+      const amt = 100;
+      await gem.mint(ALI, amt);
+      gas = await gem.estimateGas.transfer(BOB, amt);
+      maxGas = 52117;
+      minGas = 52117;
+    });
+
+    describe('transferFrom', () => {
+      it('allowance < UINT256_MAX', async () => {
+        const amt = 100;
+        await gem.mint(ALI, amt);
+        await gem.approve(BOB, amt);
+        gas    = await gem.connect(bob).estimateGas.transferFrom(ALI, BOB, amt);
+        maxGas = 58765;
+        minGas = 58765;
+      });
+
+      it('allowance == UINT256_MAX', async () => {
+        const amt = Buffer.from('ff'.repeat(32), 'hex');
+        await gem.mint(ALI, amt);
+        await gem.approve(BOB, amt);
+        gas    = await gem.connect(bob).estimateGas.transferFrom(ALI, BOB, amt);
+        maxGas = 55762;
+        minGas = 55762;
+      });
+    });
+
+    it('burn', async () => {
+        const amt = 100;
+        await gem.mint(ALI, amt);
+        gas = await gem.estimateGas.burn(ALI, amt);
+        maxGas = 36943;
+        minGas = 36943;
+    });
+
+    it('approve', async () => {
+        const amt = 100;
+        await gem.mint(ALI, amt);
+        gas    = await gem.estimateGas.approve(BOB, amt);
+        maxGas = 46693;
+        minGas = 46693;
+    });
+
+    it('permit', async () => {
+      const amt = 42;
+      const nonce = 0;
+      const deadline = Math.floor(Date.now() / 1000) * 2;
+
+      const types = {
+         Permit: [
+            { name: 'owner',    type: 'address' },
+            { name: 'spender',  type: 'address' },
+            { name: 'value',    type: 'uint256' },
+            { name: 'nonce',    type: 'uint256' },
+            { name: 'deadline', type: 'uint256' }
+          ]
+      };
+      const domain = {
+          name: 'GemPermit',
+          version: '0',
+          chainId: chainId,
+          verifyingContract: gem.address
+      };
+      const value = {
+        owner:    ALI,
+        spender:  BOB,
+        value:    amt,
+        nonce:    nonce,
+        deadline: deadline
+      };
+
+      const signature = await ali._signTypedData(domain, types, value);
+      const sig       = ethers.utils.splitSignature(signature)
+
+      gas = await gem.connect(ali).estimateGas.permit(ALI, BOB, amt, deadline, sig.v, sig.r, sig.s);
+      maxGas = 77397;
+      minGas = 77061;
+    });
+  });
 })
