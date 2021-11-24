@@ -42,6 +42,12 @@ describe('gemfab', () => {
     await fail('ErrAuth', gembob.mint, BOB, 100)
   })
 
+  it('burn underflow', async () => {
+      await send(gem.mint, ALI, 100);
+      await send(gem.mint, BOB, 100); // totalSupply wont be cause of underflow
+      await fail('ErrUnderflow', gem.burn, ALI, 101);
+  });
+
   describe('gas cost', () => {
     let gas, maxGas, minGas;
     afterEach(async () => {
@@ -51,10 +57,16 @@ describe('gemfab', () => {
       }
     });
 
+    it('mint 0', async() => {
+      gas    = await gem.estimateGas.mint(ALI, 0);
+      maxGas = 31416;
+      minGas = 31416;
+    })
+
     it('mint', async () => {
       gas    = await gem.estimateGas.mint(ALI, 100);
-      maxGas = 71222;
-      minGas = 71222;
+      maxGas = 70985;
+      minGas = 70985;
     });
 
     it('transfer', async () => {
@@ -71,8 +83,8 @@ describe('gemfab', () => {
         await gem.mint(ALI, amt);
         await gem.approve(BOB, amt);
         gas    = await gem.connect(bob).estimateGas.transferFrom(ALI, BOB, amt);
-        maxGas = 58765;
-        minGas = 58765;
+        maxGas = 58539;
+        minGas = 58539;
       });
 
       it('allowance == UINT256_MAX', async () => {
@@ -80,8 +92,8 @@ describe('gemfab', () => {
         await gem.mint(ALI, amt);
         await gem.approve(BOB, amt);
         gas    = await gem.connect(bob).estimateGas.transferFrom(ALI, BOB, amt);
-        maxGas = 55762;
-        minGas = 55762;
+        maxGas = 55556;
+        minGas = 55556;
       });
     });
 
@@ -89,8 +101,8 @@ describe('gemfab', () => {
         const amt = 100;
         await gem.mint(ALI, amt);
         gas = await gem.estimateGas.burn(ALI, amt);
-        maxGas = 36943;
-        minGas = 36943;
+        maxGas = 36708;
+        minGas = 36708;
     });
 
     it('approve', async () => {
@@ -133,8 +145,8 @@ describe('gemfab', () => {
       const sig       = ethers.utils.splitSignature(signature)
 
       gas = await gem.connect(ali).estimateGas.permit(ALI, BOB, amt, deadline, sig.v, sig.r, sig.s);
-      maxGas = 77397;
-      minGas = 77061;
+      maxGas = 76821; // ? variable sig size?
+      minGas = 76797;
     });
   });
 })

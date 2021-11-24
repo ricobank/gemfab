@@ -284,7 +284,7 @@ contract('ERC20', function (accounts) {
     describe('for a non zero account', function () {
       it('rejects burning more than balance', async function () {
         await expectRevert(this.token.burn(
-          initialHolder, initialSupply.addn(1)), 'underflow',
+          initialHolder, initialSupply.addn(1)), 'ErrUnderflow',
         );
       });
 
