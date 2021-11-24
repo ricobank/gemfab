@@ -66,6 +66,8 @@ contract Gem is Warded {
 
     error ErrPermitDeadline();
     error ErrPermitSignature();
+    error ErrOverflow();
+    error ErrUnderflow();
 
     constructor(string memory name_, string memory symbol_) {
         name = name_;
@@ -89,21 +91,39 @@ contract Gem is Warded {
             allowance[src][msg.sender] -= wad;
         }
         balanceOf[src] -= wad;
-        balanceOf[dst] += wad;
+        unchecked {
+            balanceOf[dst] += wad;
+        }
         emit Transfer(src, dst, wad);
         return true;
     }
 
     function mint(address usr, uint wad) external auth {
-        balanceOf[usr] += wad;
-        totalSupply    += wad;
-        emit Transfer(address(0), usr, wad);
+        // only need to check totalSupply for overflow
+        unchecked { 
+            uint256 prev = totalSupply;
+            uint256 next = totalSupply + wad;
+            if (next < prev) {
+                revert ErrOverflow();
+            }
+            balanceOf[usr] += wad;
+            totalSupply    = next;
+            emit Transfer(address(0), usr, wad);
+        }
     }
 
     function burn(address usr, uint wad) external auth {
-        balanceOf[usr] -= wad;
-        totalSupply    -= wad;
-        emit Transfer(usr, address(0), wad);
+        // only need to check balanceOf[usr] for underflow
+        unchecked {
+            uint256 prev = balanceOf[usr];
+            uint256 next = prev - wad;
+            if (next > prev) {
+                revert ErrUnderflow();
+            }
+            balanceOf[usr] = next;
+            totalSupply    -= wad;
+            emit Transfer(usr, address(0), wad);
+        }
     }
 
     function approve(address usr, uint wad) external returns (bool) {
@@ -122,7 +142,9 @@ contract Gem is Warded {
         address signer = ecrecover(digest, v, r, s);
         if (signer == address(0) || owner != signer) { revert ErrPermitSignature(); }
         if (block.timestamp > deadline) { revert ErrPermitDeadline(); }
-        nonces[owner]++;
+        unchecked {
+            nonces[owner] = nonce + 1;
+        }
         allowance[owner][spender] = value;
         emit Approval(owner, spender, value);
     }
