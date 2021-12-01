@@ -56,7 +56,7 @@ contract Gem is Warded {
     bytes32 public immutable DOMAIN_SEPARATOR = keccak256(abi.encode(
         keccak256("EIP712Domain(string name,string version,uint256 chainId,address verifyingContract)"),
         keccak256("GemPermit"),
-        keccak256(bytes("0")),
+        keccak256("0"),
         block.chainid,
         address(this)
     ));
