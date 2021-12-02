@@ -4,9 +4,24 @@ import { want, send, fail, snapshot, revert } from 'minihat'
 
 import { TypedDataUtils } from 'ethers-eip712'
 
-
-
 const debug = require('debug')('gemfab:test')
+
+const types = {
+   Permit: [
+      { name: 'owner',    type: 'address' },
+      { name: 'spender',  type: 'address' },
+      { name: 'value',    type: 'uint256' },
+      { name: 'nonce',    type: 'uint256' },
+      { name: 'deadline', type: 'uint256' }
+    ]
+};
+
+const domain = {
+    name: 'GemPermit',
+    version: '0',
+    chainId: undefined,
+    verifyingContract: undefined
+};
 
 describe('gemfab', () => {
   let chainId;
@@ -28,6 +43,9 @@ describe('gemfab', () => {
     await snapshot(hh)
 
     chainId = await hh.web3.eth.getChainId();
+
+    domain.chainId           = chainId;
+    domain.verifyingContract = gem.address;
   })
   beforeEach(async () => {
     await revert(hh)
@@ -98,7 +116,7 @@ describe('gemfab', () => {
     });
 
     it('burn', async () => {
-        const amt = 100;
+        const amt = 1;
         await gem.mint(ALI, amt);
         gas = await gem.estimateGas.burn(ALI, amt);
         maxGas = 36708;
@@ -118,21 +136,6 @@ describe('gemfab', () => {
       const nonce = 0;
       const deadline = Math.floor(Date.now() / 1000) * 2;
 
-      const types = {
-         Permit: [
-            { name: 'owner',    type: 'address' },
-            { name: 'spender',  type: 'address' },
-            { name: 'value',    type: 'uint256' },
-            { name: 'nonce',    type: 'uint256' },
-            { name: 'deadline', type: 'uint256' }
-          ]
-      };
-      const domain = {
-          name: 'GemPermit',
-          version: '0',
-          chainId: chainId,
-          verifyingContract: gem.address
-      };
       const value = {
         owner:    ALI,
         spender:  BOB,
@@ -149,16 +152,75 @@ describe('gemfab', () => {
       minGas = 76797;
     });
   });
-  describe('permissions', () => {
-    it('deny unauthed', async function () {
-      await send(gem.mint, ALI, 100);
+
+  describe('rely/deny', () => {
+    it('deny permissions', async function () {
       await fail('ErrAuth', gem.connect(bob).deny, ALI);
+      await fail('ErrAuth', gem.connect(bob).deny, BOB);
+      await send(gem.deny, BOB);
+      await send(gem.rely, BOB);
+      await send(gem.deny, BOB);
+      await send(gem.deny, ALI);
+      await fail('ErrAuth', gem.rely, ALI);
+      await fail('ErrAuth', gem.connect(bob).rely, ALI);
     });
 
-    it('lock out example', async function () {
-      await send(gem.mint, ALI, 100);
+    it('lockout example', async function () {
+      await send(gem.mint, ALI, 1);
       await gem.connect(bob).deny(ALI).then((res) => {}, (err) => {});
-      await send(gem.mint, ALI, 100);
+      await send(gem.mint, ALI, 1);
     });
+
+    it('burn', async function () {
+      await send(gem.mint, ALI, 1);
+      await fail('ErrAuth', gem.connect(bob).burn, ALI, 1);
+      await send(gem.rely, BOB);
+      await send(gem.connect(bob).burn, ALI, 1);
+    });
+
+    it('mint', async function () {
+      await fail('ErrAuth', gem.connect(bob).burn, ALI, 1);
+      await send(gem.rely, BOB);
+      await send(gem.connect(bob).mint, ALI, 1);
+    });
+
+    it('public methods', async function () {
+      const amt = 42;
+      const nonce = 0;
+      const deadline = Math.floor(Date.now() / 1000) * 2;
+      const value = {
+        owner:    ALI,
+        spender:  BOB,
+        value:    amt,
+        nonce:    nonce,
+        deadline: deadline
+      };
+      await send(gem.mint, ALI, 100);
+      await send(gem.transfer, BOB, 100);
+      const gembob = gem.connect(bob);
+
+      // pass with bob denied
+      await send(gem.deny, BOB);
+      await send(gembob.transfer, ALI, 1);
+      await send(gembob.approve, ALI, 1);
+      await send(gembob.approve, BOB, 1);
+      await send(gembob.transferFrom, BOB, ALI, 1);
+      let signature = await ali._signTypedData(domain, types, value);
+      let sig       = ethers.utils.splitSignature(signature)
+      await send(gem.connect(bob).permit, ALI, BOB, amt, deadline, sig.v, sig.r, sig.s);
+
+      // pass with bob relied
+      await send(gem.rely, BOB);
+      await send(gembob.transfer, ALI, 1);
+      await send(gembob.approve, ALI, 1);
+      await send(gembob.approve, BOB, 1);
+      await send(gembob.transferFrom, BOB, ALI, 1);
+      value.nonce++;
+      signature = await ali._signTypedData(domain, types, value);
+      sig       = ethers.utils.splitSignature(signature)
+      await send(gem.connect(bob).permit, ALI, BOB, amt, deadline, sig.v, sig.r, sig.s);
+    });
+    
   });
+
 })
