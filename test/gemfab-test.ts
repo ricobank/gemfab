@@ -149,4 +149,16 @@ describe('gemfab', () => {
       minGas = 76797;
     });
   });
+  describe('permissions', () => {
+    it('deny unauthed', async function () {
+      await send(gem.mint, ALI, 100);
+      await fail('ErrAuth', gem.connect(bob).deny, ALI);
+    });
+
+    it('lock out example', async function () {
+      await send(gem.mint, ALI, 100);
+      await gem.connect(bob).deny(ALI).then((res) => {}, (err) => {});
+      await send(gem.mint, ALI, 100);
+    });
+  });
 })

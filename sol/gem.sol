@@ -30,7 +30,7 @@ abstract contract Warded {
         wards[usr] = true;
         emit Ward(msg.sender, usr, true);
     }
-    function deny(address usr) external {
+    function deny(address usr) external auth {
         wards[usr] = false;
         emit Ward(msg.sender, usr, false);
     }
