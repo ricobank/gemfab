@@ -1,6 +1,7 @@
 import * as hh from 'hardhat'
 import { ethers, artifacts, network } from 'hardhat'
 import { want, send, fail, snapshot, revert } from 'minihat'
+const { constants, BigNumber } = ethers
 
 import { TypedDataUtils } from 'ethers-eip712'
 
@@ -147,6 +148,16 @@ describe('gemfab', () => {
       gas = await gem.connect(ali).estimateGas.permit(ALI, BOB, amt, deadline, sig.v, sig.r, sig.s);
       maxGas = 76821; // ? variable sig size?
       minGas = 76797;
+    });
+  });
+  describe('coverage', () => {
+    describe('mint', () => {
+      it('overflow', async function () {
+        await send(gem.mint, ALI, constants.MaxUint256.div(2));
+        await send(gem.mint, BOB, constants.MaxUint256.div(2))
+        await send(gem.mint, CAT, 1)
+        await fail('ErrOverflow', gem.mint, CAT, 1);
+      });
     });
   });
 })
