@@ -78,8 +78,14 @@ contract Gem is Warded {
     }
 
     function transfer(address dst, uint wad) external returns (bool) {
-        balanceOf[msg.sender] -= wad;
-        balanceOf[dst] += wad;
+        uint256 prev = balanceOf[msg.sender];
+        if( prev < wad ) {
+            revert ErrUnderflow();
+        }
+        unchecked {
+            balanceOf[msg.sender] = prev - wad;
+            balanceOf[dst]       += wad;
+        }
         emit Transfer(msg.sender, dst, wad);
         return true;
     }
@@ -88,10 +94,20 @@ contract Gem is Warded {
         external returns (bool)
     {
         if (allowance[src][msg.sender] != type(uint256).max) {
-            allowance[src][msg.sender] -= wad;
+            uint256 prev = allowance[src][msg.sender];
+            if( prev < wad ) {
+                revert ErrUnderflow();
+            }
+            unchecked {
+                allowance[src][msg.sender] = prev - wad;
+            }
         }
-        balanceOf[src] -= wad;
+        uint256 prev = balanceOf[src];
+        if( prev < wad ) {
+            revert ErrUnderflow();
+        }
         unchecked {
+            balanceOf[src]  = prev - wad;
             balanceOf[dst] += wad;
         }
         emit Transfer(src, dst, wad);
@@ -100,7 +116,7 @@ contract Gem is Warded {
 
     function mint(address usr, uint wad) external auth {
         // only need to check totalSupply for overflow
-        unchecked { 
+        unchecked {
             uint256 prev = totalSupply;
             uint256 next = totalSupply + wad;
             if (next < prev) {
@@ -108,22 +124,21 @@ contract Gem is Warded {
             }
             balanceOf[usr] += wad;
             totalSupply    = next;
-            emit Transfer(address(0), usr, wad);
         }
+        emit Transfer(address(0), usr, wad);
     }
 
     function burn(address usr, uint wad) external auth {
         // only need to check balanceOf[usr] for underflow
-        unchecked {
-            uint256 prev = balanceOf[usr];
-            uint256 next = prev - wad;
-            if (next > prev) {
-                revert ErrUnderflow();
-            }
-            balanceOf[usr] = next;
-            totalSupply    -= wad;
-            emit Transfer(usr, address(0), wad);
+        uint256 prev = balanceOf[usr];
+        if ( prev < wad ) {
+            revert ErrUnderflow();
         }
+        unchecked {
+            balanceOf[usr]  = prev - wad;
+            totalSupply    -= wad;
+        }
+        emit Transfer(usr, address(0), wad);
     }
 
     function approve(address usr, uint wad) external returns (bool) {
