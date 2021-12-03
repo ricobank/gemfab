@@ -1,6 +1,7 @@
 import * as hh from 'hardhat'
 import { ethers, artifacts, network } from 'hardhat'
 import { want, send, fail, snapshot, revert } from 'minihat'
+const { constants, BigNumber } = ethers
 
 import { TypedDataUtils } from 'ethers-eip712'
 
@@ -64,6 +65,26 @@ describe('gemfab', () => {
       await send(gem.mint, ALI, 100);
       await send(gem.mint, BOB, 100); // totalSupply wont be cause of underflow
       await fail('ErrUnderflow', gem.burn, ALI, 101);
+  });
+
+  describe('coverage', () => {
+    describe('mint', () => {
+      it('overflow', async function () {
+        await send(gem.mint, ALI, constants.MaxUint256.div(2));
+        await send(gem.mint, BOB, constants.MaxUint256.div(2))
+        await send(gem.mint, CAT, 1)
+        await fail('ErrOverflow', gem.mint, CAT, 1);
+      });
+    });
+
+    describe('approve', () => {
+      it('nonzero', async function () {
+        await send(gem.approve, BOB, 0);
+        want((await gem.allowance(ALI, BOB)).toNumber()).to.equal(0);
+        await send(gem.approve, BOB, 1);
+        want((await gem.allowance(ALI, BOB)).toNumber()).to.equal(1);
+      });
+    });
   });
 
   describe('gas cost', () => {
