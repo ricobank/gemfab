@@ -49,6 +49,26 @@ describe('gemfab', () => {
       await fail('ErrUnderflow', gem.burn, ALI, 101);
   });
 
+  describe('coverage', () => {
+    describe('mint', () => {
+      it('overflow', async function () {
+        await send(gem.mint, ALI, constants.MaxUint256.div(2));
+        await send(gem.mint, BOB, constants.MaxUint256.div(2))
+        await send(gem.mint, CAT, 1)
+        await fail('ErrOverflow', gem.mint, CAT, 1);
+      });
+    });
+
+    describe('approve', () => {
+      it('nonzero', async function () {
+        await send(gem.approve, BOB, 0);
+        want((await gem.allowance(ALI, BOB)).toNumber()).to.equal(0);
+        await send(gem.approve, BOB, 1);
+        want((await gem.allowance(ALI, BOB)).toNumber()).to.equal(1);
+      });
+    });
+  });
+
   describe('gas cost', () => {
     let gas, maxGas, minGas;
     afterEach(async () => {
@@ -148,16 +168,6 @@ describe('gemfab', () => {
       gas = await gem.connect(ali).estimateGas.permit(ALI, BOB, amt, deadline, sig.v, sig.r, sig.s);
       maxGas = 76821; // ? variable sig size?
       minGas = 76797;
-    });
-  });
-  describe('coverage', () => {
-    describe('mint', () => {
-      it('overflow', async function () {
-        await send(gem.mint, ALI, constants.MaxUint256.div(2));
-        await send(gem.mint, BOB, constants.MaxUint256.div(2))
-        await send(gem.mint, CAT, 1)
-        await fail('ErrOverflow', gem.mint, CAT, 1);
-      });
     });
   });
 })
