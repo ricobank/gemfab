@@ -169,21 +169,21 @@ describe('gemfab', () => {
       const sig       = ethers.utils.splitSignature(signature)
 
       gas = await gem.connect(ali).estimateGas.permit(ALI, BOB, amt, deadline, sig.v, sig.r, sig.s);
-      maxGas = 76821; // ? variable sig size?
-      minGas = 76797;
+      maxGas = 76797; // ? variable sig size?
+      minGas = 76773;
     });
 
     it('rely', async function () {
       gas    = await gem.estimateGas.rely(BOB);
-      maxGas = 48461;
-      minGas = 48461;
+      maxGas = 48437;
+      minGas = 48437;
     });
 
     it('deny', async function () {
       await send(gem.rely, BOB);
       gas    = await gem.estimateGas.deny(BOB);
-      maxGas = 31514;
-      minGas = 31514;
+      maxGas = 31486;
+      minGas = 31486;
     });
   });
 

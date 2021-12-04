@@ -26,11 +26,11 @@ abstract contract Warded {
         wards[msg.sender] = true;
         emit Ward(msg.sender, msg.sender, true);
     }
-    function rely(address usr) external auth {
+    function rely(address usr) external payable auth {
         wards[usr] = true;
         emit Ward(msg.sender, usr, true);
     }
-    function deny(address usr) external auth {
+    function deny(address usr) external payable auth {
         wards[usr] = false;
         emit Ward(msg.sender, usr, false);
     }
