@@ -77,7 +77,7 @@ contract Gem is Warded {
         emit Ward(msg.sender, msg.sender, true);
     }
 
-    function transfer(address dst, uint wad) external returns (bool) {
+    function transfer(address dst, uint wad) external payable returns (bool) {
         balanceOf[msg.sender] -= wad;
         balanceOf[dst] += wad;
         emit Transfer(msg.sender, dst, wad);
@@ -85,7 +85,7 @@ contract Gem is Warded {
     }
 
     function transferFrom(address src, address dst, uint wad)
-        external returns (bool)
+        external payable returns (bool)
     {
         if (allowance[src][msg.sender] != type(uint256).max) {
             allowance[src][msg.sender] -= wad;
@@ -98,7 +98,7 @@ contract Gem is Warded {
         return true;
     }
 
-    function mint(address usr, uint wad) external auth {
+    function mint(address usr, uint wad) external payable auth {
         // only need to check totalSupply for overflow
         unchecked { 
             uint256 prev = totalSupply;
@@ -112,7 +112,7 @@ contract Gem is Warded {
         }
     }
 
-    function burn(address usr, uint wad) external auth {
+    function burn(address usr, uint wad) external payable auth {
         // only need to check balanceOf[usr] for underflow
         unchecked {
             uint256 prev = balanceOf[usr];
@@ -126,7 +126,7 @@ contract Gem is Warded {
         }
     }
 
-    function approve(address usr, uint wad) external returns (bool) {
+    function approve(address usr, uint wad) external payable returns (bool) {
         allowance[msg.sender][usr] = wad;
         emit Approval(msg.sender, usr, wad);
         return true;
@@ -134,7 +134,7 @@ contract Gem is Warded {
 
     // EIP-2612
     function permit(address owner, address spender, uint256 value, uint256 deadline,
-                    uint8 v, bytes32 r, bytes32 s) external
+                    uint8 v, bytes32 r, bytes32 s) payable external
     {
         uint nonce = nonces[owner];
         bytes32 digest = keccak256(abi.encodePacked( "\x19\x01", DOMAIN_SEPARATOR,

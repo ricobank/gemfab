@@ -98,22 +98,22 @@ describe('gemfab', () => {
 
     it('mint 0', async() => {
       gas    = await gem.estimateGas.mint(ALI, 0);
-      maxGas = 31416;
-      minGas = 31416;
+      maxGas = 31392;
+      minGas = 31392;
     })
 
     it('mint', async () => {
       gas    = await gem.estimateGas.mint(ALI, 100);
-      maxGas = 70985;
-      minGas = 70985;
+      maxGas = 70961;
+      minGas = 70961;
     });
 
     it('transfer', async () => {
       const amt = 100;
       await gem.mint(ALI, amt);
       gas = await gem.estimateGas.transfer(BOB, amt);
-      maxGas = 52117;
-      minGas = 52117;
+      maxGas = 52091;
+      minGas = 52091;
     });
 
     describe('transferFrom', () => {
@@ -122,8 +122,8 @@ describe('gemfab', () => {
         await gem.mint(ALI, amt);
         await gem.approve(BOB, amt);
         gas    = await gem.connect(bob).estimateGas.transferFrom(ALI, BOB, amt);
-        maxGas = 58539;
-        minGas = 58539;
+        maxGas = 58510;
+        minGas = 58510;
       });
 
       it('allowance == UINT256_MAX', async () => {
@@ -131,8 +131,8 @@ describe('gemfab', () => {
         await gem.mint(ALI, amt);
         await gem.approve(BOB, amt);
         gas    = await gem.connect(bob).estimateGas.transferFrom(ALI, BOB, amt);
-        maxGas = 55556;
-        minGas = 55556;
+        maxGas = 55529;
+        minGas = 55529;
       });
     });
 
@@ -140,16 +140,16 @@ describe('gemfab', () => {
         const amt = 1;
         await gem.mint(ALI, amt);
         gas = await gem.estimateGas.burn(ALI, amt);
-        maxGas = 36708;
-        minGas = 36708;
+        maxGas = 36685;
+        minGas = 36685;
     });
 
     it('approve', async () => {
         const amt = 100;
         await gem.mint(ALI, amt);
         gas    = await gem.estimateGas.approve(BOB, amt);
-        maxGas = 46693;
-        minGas = 46693;
+        maxGas = 46669;
+        minGas = 46669;
     });
 
     it('permit', async () => {
@@ -171,6 +171,19 @@ describe('gemfab', () => {
       gas = await gem.connect(ali).estimateGas.permit(ALI, BOB, amt, deadline, sig.v, sig.r, sig.s);
       maxGas = 76821; // ? variable sig size?
       minGas = 76797;
+    });
+
+    it('rely', async function () {
+      gas    = await gem.estimateGas.rely(BOB);
+      maxGas = 48461;
+      minGas = 48461;
+    });
+
+    it('deny', async function () {
+      await send(gem.rely, BOB);
+      gas    = await gem.estimateGas.deny(BOB);
+      maxGas = 31514;
+      minGas = 31514;
     });
   });
 
@@ -254,4 +267,37 @@ describe('gemfab', () => {
     
   });
 
+  it('external payable', async function () {
+    await send(gem.mint, ALI, 1, {value: 1});
+    debug('mint payable');
+    await send(gem.transfer, BOB, 1, {value: 1});
+    debug('transfer payable');
+    await send(gem.connect(bob).approve, ALI, 1, {value: 1});
+    debug('approve payable');
+    await send(gem.transferFrom, BOB, ALI, 1, {value: 1});
+    debug('transferFrom payable');
+
+    const amt      = 1;
+    const nonce    = 0;
+    const deadline = Math.floor(Date.now() / 1000) * 2;
+    const value    = {
+      owner:    ALI,
+      spender:  BOB,
+      value:    amt,
+      nonce:    nonce,
+      deadline: deadline
+    };
+    const signature = await ali._signTypedData(domain, types, value);
+    const sig       = ethers.utils.splitSignature(signature)
+    await send(gem.permit, ALI, BOB, amt, deadline, sig.v, sig.r, sig.s, {value: 1});
+    debug('permit payable');
+
+    await send(gem.burn, ALI, 1, {value: 1});
+    debug('burn payable');
+
+    await send(gem.rely, BOB, {value: 1});
+    debug('rely payable');
+    await send(gem.deny, BOB, {value: 1});
+    debug('deny payable');
+  });
 })
