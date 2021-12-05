@@ -150,7 +150,7 @@ contract Gem {
 contract GemFab {
     mapping(address=>bool) public built;
 
-    event Build(address indexed caller, address indexed gem, string indexed symbol);
+    event Build(address indexed caller, address indexed gem, string symbol);
 
     function build(string memory name, string memory symbol) public returns (Gem gem) {
         gem = new Gem(name, symbol);
