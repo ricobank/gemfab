@@ -90,20 +90,18 @@ contract Gem {
         external returns (bool)
     {
         unchecked {
-            {
-                uint256 prev = allowance[src][msg.sender];
-                if ( prev != type(uint256).max ) {
-                    if( prev < wad ) {
-                        revert ErrUnderflow();
-                    }
-                    allowance[src][msg.sender] = prev - wad;
-                }
-                prev = balanceOf[src];
+            uint256 prev = allowance[src][msg.sender];
+            if ( prev != type(uint256).max ) {
                 if( prev < wad ) {
                     revert ErrUnderflow();
                 }
-                balanceOf[src]  = prev - wad;
+                allowance[src][msg.sender] = prev - wad;
             }
+            prev = balanceOf[src];
+            if( prev < wad ) {
+                revert ErrUnderflow();
+            }
+            balanceOf[src]  = prev - wad;
             balanceOf[dst] += wad;
             emit Transfer(src, dst, wad);
             return true;
