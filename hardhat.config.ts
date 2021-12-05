@@ -8,8 +8,16 @@ import './task/deploy-gemfab'
  * @type import('hardhat/config').HardhatUserConfig
  */
 export default {
-  solidity: '0.8.9',
   paths: {
     sources: "./sol"
   },
+  solidity: {
+    version: '0.8.9',
+    settings: {
+      optimizer: {
+        enabled: true,
+        runs: 2000
+      }
+    }
+  }
 }

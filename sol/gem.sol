@@ -18,29 +18,7 @@
 
 pragma solidity 0.8.9;
 
-abstract contract Warded {
-    mapping (address => bool) public wards;
-    event Ward(address indexed caller, address indexed trusts, bool bit);
-    error ErrAuth(bytes4 sig);
-    constructor() {
-        wards[msg.sender] = true;
-        emit Ward(msg.sender, msg.sender, true);
-    }
-    function rely(address usr) external payable auth {
-        wards[usr] = true;
-        emit Ward(msg.sender, usr, true);
-    }
-    function deny(address usr) external payable auth {
-        wards[usr] = false;
-        emit Ward(msg.sender, usr, false);
-    }
-    modifier auth() {
-        if (!wards[msg.sender]) revert ErrAuth(msg.sig);
-        _;
-    }
-}
-
-contract Gem is Warded {
+contract Gem {
     string  public name;
     string  public symbol;
     uint256 public totalSupply;
@@ -49,6 +27,7 @@ contract Gem is Warded {
     mapping (address => uint)                      public balanceOf;
     mapping (address => mapping (address => uint)) public allowance;
     mapping (address => uint)                      public nonces;
+    mapping (address => bool)                      public wards;
 
     bytes32 public immutable PERMIT_TYPEHASH = keccak256(
         'Permit(address owner,address spender,uint256 value,uint256 nonce,uint256 deadline)'
@@ -63,11 +42,18 @@ contract Gem is Warded {
 
     event Approval(address indexed src, address indexed usr, uint wad);
     event Transfer(address indexed src, address indexed dst, uint wad);
-
+    event Ward(address indexed caller, address indexed trusts, bool bit);
+ 
     error ErrPermitDeadline();
     error ErrPermitSignature();
     error ErrOverflow();
     error ErrUnderflow();
+    error ErrAuth(bytes4 sig);
+
+    modifier auth() {
+        if (!wards[msg.sender]) revert ErrAuth(msg.sig);
+        _;
+    }
 
     constructor(string memory name_, string memory symbol_) {
         name = name_;
@@ -75,6 +61,16 @@ contract Gem is Warded {
 
         wards[msg.sender] = true;
         emit Ward(msg.sender, msg.sender, true);
+    }
+
+    function rely(address usr) external payable auth {
+        wards[usr] = true;
+        emit Ward(msg.sender, usr, true);
+    }
+
+    function deny(address usr) external payable auth {
+        wards[usr] = false;
+        emit Ward(msg.sender, usr, false);
     }
 
     function transfer(address dst, uint wad) external payable returns (bool) {
@@ -165,4 +161,3 @@ contract GemFab {
         return gem;
     }
 }
-
