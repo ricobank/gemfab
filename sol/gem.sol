@@ -50,11 +50,6 @@ contract Gem {
     error ErrUnderflow();
     error ErrAuth(bytes4 sig);
 
-    modifier auth() {
-        if (!wards[msg.sender]) revert ErrAuth(msg.sig);
-        _;
-    }
-
     constructor(string memory name_, string memory symbol_) {
         name = name_;
         symbol = symbol_;
@@ -63,12 +58,14 @@ contract Gem {
         emit Ward(msg.sender, msg.sender, true);
     }
 
-    function rely(address usr) external auth {
+    function rely(address usr) external {
+        if (!wards[msg.sender]) revert ErrAuth(msg.sig);
         wards[usr] = true;
         emit Ward(msg.sender, usr, true);
     }
 
-    function deny(address usr) external auth {
+    function deny(address usr) external {
+        if (!wards[msg.sender]) revert ErrAuth(msg.sig);
         wards[usr] = false;
         emit Ward(msg.sender, usr, false);
     }
@@ -94,7 +91,8 @@ contract Gem {
         return true;
     }
 
-    function mint(address usr, uint wad) external auth {
+    function mint(address usr, uint wad) external {
+        if (!wards[msg.sender]) revert ErrAuth(msg.sig);
         // only need to check totalSupply for overflow
         unchecked { 
             uint256 prev = totalSupply;
@@ -108,7 +106,8 @@ contract Gem {
         }
     }
 
-    function burn(address usr, uint wad) external auth {
+    function burn(address usr, uint wad) external {
+        if (!wards[msg.sender]) revert ErrAuth(msg.sig);
         // only need to check balanceOf[usr] for underflow
         unchecked {
             uint256 prev = balanceOf[usr];
