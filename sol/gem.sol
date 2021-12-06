@@ -27,9 +27,9 @@ contract Gem {
     mapping (address => uint)                      public balanceOf;
     mapping (address => mapping (address => uint)) public allowance;
     mapping (address => uint)                      public nonces;
-    mapping (address => bool)                      public wards;
+    mapping (address => bool)                             wards;
 
-    bytes32 public immutable PERMIT_TYPEHASH = keccak256(
+    bytes32        immutable PERMIT_TYPEHASH = keccak256(
         'Permit(address owner,address spender,uint256 value,uint256 nonce,uint256 deadline)'
     );
     bytes32 public immutable DOMAIN_SEPARATOR = keccak256(abi.encode(

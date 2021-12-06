@@ -112,8 +112,8 @@ describe('gemfab', () => {
       const amt = 100;
       await gem.mint(ALI, amt);
       gas = await gem.estimateGas.transfer(BOB, amt);
-      maxGas = 51505;
-      minGas = 51505;
+      maxGas = 51480;
+      minGas = 51480;
     });
 
     describe('transferFrom', () => {
@@ -140,8 +140,8 @@ describe('gemfab', () => {
         const amt = 1;
         await gem.mint(ALI, amt);
         gas = await gem.estimateGas.burn(ALI, amt);
-        maxGas = 36210;
-        minGas = 36210;
+        maxGas = 36175;
+        minGas = 36175;
     });
 
     it('approve', async () => {
