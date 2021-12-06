@@ -97,7 +97,7 @@ function shouldBehaveLikeERC20 (errorPrefix, initialSupply, initialHolder, recip
 
             it('reverts', async function () {
               await expectRevert(this.token.transferFrom(
-                tokenOwner, to, amount, { from: spender }), `underflow`,
+                tokenOwner, to, amount, { from: spender }), `ErrUnderflow`,
               );
             });
           });
@@ -113,7 +113,7 @@ function shouldBehaveLikeERC20 (errorPrefix, initialSupply, initialHolder, recip
 
             it('reverts', async function () {
               await expectRevert(this.token.transferFrom(
-                tokenOwner, to, amount, { from: spender }), `underflow`,
+                tokenOwner, to, amount, { from: spender }), `ErrUnderflow`,
               );
             });
           });
@@ -123,7 +123,7 @@ function shouldBehaveLikeERC20 (errorPrefix, initialSupply, initialHolder, recip
 
             it('reverts', async function () {
               await expectRevert(this.token.transferFrom(
-                tokenOwner, to, amount, { from: spender }), `underflow`,
+                tokenOwner, to, amount, { from: spender }), `ErrUnderflow`,
               );
             });
           });
@@ -178,7 +178,7 @@ function shouldBehaveLikeERC20Transfer (errorPrefix, from, to, balance, transfer
       const amount = balance.addn(1);
 
       it('reverts', async function () {
-        await expectRevert(transfer.call(this, from, to, amount), `underflow`,
+        await expectRevert(transfer.call(this, from, to, amount), `ErrUnderflow`,
         );
       });
     });

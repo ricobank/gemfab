@@ -74,24 +74,38 @@ contract Gem {
     }
 
     function transfer(address dst, uint wad) external returns (bool) {
-        balanceOf[msg.sender] -= wad;
-        balanceOf[dst] += wad;
-        emit Transfer(msg.sender, dst, wad);
-        return true;
+        unchecked {
+            uint256 prev = balanceOf[msg.sender];
+            if( prev < wad ) {
+                revert ErrUnderflow();
+            }
+            balanceOf[msg.sender] = prev - wad;
+            balanceOf[dst]       += wad;
+            emit Transfer(msg.sender, dst, wad);
+            return true;
+        }
     }
 
     function transferFrom(address src, address dst, uint wad)
         external returns (bool)
     {
-        if (allowance[src][msg.sender] != type(uint256).max) {
-            allowance[src][msg.sender] -= wad;
-        }
-        balanceOf[src] -= wad;
         unchecked {
+            uint256 prev = allowance[src][msg.sender];
+            if ( prev != type(uint256).max ) {
+                if( prev < wad ) {
+                    revert ErrUnderflow();
+                }
+                allowance[src][msg.sender] = prev - wad;
+            }
+            prev = balanceOf[src];
+            if( prev < wad ) {
+                revert ErrUnderflow();
+            }
+            balanceOf[src]  = prev - wad;
             balanceOf[dst] += wad;
+            emit Transfer(src, dst, wad);
+            return true;
         }
-        emit Transfer(src, dst, wad);
-        return true;
     }
 
     function mint(address usr, uint wad) external auth {
