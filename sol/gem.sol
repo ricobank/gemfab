@@ -74,36 +74,49 @@ contract Gem {
     }
 
     function transfer(address dst, uint wad) external payable returns (bool) {
-        balanceOf[msg.sender] -= wad;
-        balanceOf[dst] += wad;
-        emit Transfer(msg.sender, dst, wad);
-        return true;
+        unchecked {
+            uint256 prev = balanceOf[msg.sender];
+            if( prev < wad ) {
+                revert ErrUnderflow();
+            }
+            balanceOf[msg.sender] = prev - wad;
+            balanceOf[dst]       += wad;
+            emit Transfer(msg.sender, dst, wad);
+            return true;
+        }
     }
 
     function transferFrom(address src, address dst, uint wad)
         external payable returns (bool)
     {
-        if (allowance[src][msg.sender] != type(uint256).max) {
-            allowance[src][msg.sender] -= wad;
-        }
-        balanceOf[src] -= wad;
         unchecked {
+            uint256 prev = allowance[src][msg.sender];
+            if ( prev != type(uint256).max ) {
+                if( prev < wad ) {
+                    revert ErrUnderflow();
+                }
+                allowance[src][msg.sender] = prev - wad;
+            }
+            prev = balanceOf[src];
+            if( prev < wad ) {
+                revert ErrUnderflow();
+            }
+            balanceOf[src]  = prev - wad;
             balanceOf[dst] += wad;
+            emit Transfer(src, dst, wad);
+            return true;
         }
-        emit Transfer(src, dst, wad);
-        return true;
     }
 
     function mint(address usr, uint wad) external payable auth {
         // only need to check totalSupply for overflow
         unchecked { 
             uint256 prev = totalSupply;
-            uint256 next = totalSupply + wad;
-            if (next < prev) {
+            if (prev + wad < prev) {
                 revert ErrOverflow();
             }
             balanceOf[usr] += wad;
-            totalSupply    = next;
+            totalSupply     = prev + wad;
             emit Transfer(address(0), usr, wad);
         }
     }
@@ -150,7 +163,7 @@ contract Gem {
 contract GemFab {
     mapping(address=>bool) public built;
 
-    event Build(address indexed caller, address indexed gem, string indexed symbol);
+    event Build(address indexed caller, address indexed gem, string symbol);
 
     function build(string memory name, string memory symbol) public returns (Gem gem) {
         gem = new Gem(name, symbol);
