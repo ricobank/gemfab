@@ -112,12 +112,11 @@ contract Gem {
         // only need to check totalSupply for overflow
         unchecked { 
             uint256 prev = totalSupply;
-            uint256 next = totalSupply + wad;
-            if (next < prev) {
+            if (prev + wad < prev) {
                 revert ErrOverflow();
             }
             balanceOf[usr] += wad;
-            totalSupply    = next;
+            totalSupply     = prev + wad;
             emit Transfer(address(0), usr, wad);
         }
     }
