@@ -98,22 +98,22 @@ describe('gemfab', () => {
 
     it('mint 0', async() => {
       gas    = await gem.estimateGas.mint(ALI, 0);
-      maxGas = 30982;
-      minGas = 30982;
+      maxGas = 30958;
+      minGas = 30958;
     })
 
     it('mint', async () => {
       gas    = await gem.estimateGas.mint(ALI, 100);
-      maxGas = 70318;
-      minGas = 70318;
+      maxGas = 70294;
+      minGas = 70294;
     });
 
     it('transfer', async () => {
       const amt = 100;
       await gem.mint(ALI, amt);
       gas = await gem.estimateGas.transfer(BOB, amt);
-      maxGas = 51505;
-      minGas = 51505;
+      maxGas = 51479;
+      minGas = 51479;
     });
 
     describe('transferFrom', () => {
@@ -122,8 +122,8 @@ describe('gemfab', () => {
         await gem.mint(ALI, amt);
         await gem.approve(BOB, amt);
         gas    = await gem.connect(bob).estimateGas.transferFrom(ALI, BOB, amt);
-        maxGas = 57202;
-        minGas = 57202;
+        maxGas = 57115;
+        minGas = 57115;
       });
 
       it('allowance == UINT256_MAX', async () => {
@@ -131,8 +131,8 @@ describe('gemfab', () => {
         await gem.mint(ALI, amt);
         await gem.approve(BOB, amt);
         gas    = await gem.connect(bob).estimateGas.transferFrom(ALI, BOB, amt);
-        maxGas = 54656;
-        minGas = 54656;
+        maxGas = 54590;
+        minGas = 54590;
       });
     });
 
@@ -140,16 +140,16 @@ describe('gemfab', () => {
         const amt = 1;
         await gem.mint(ALI, amt);
         gas = await gem.estimateGas.burn(ALI, amt);
-        maxGas = 36210;
-        minGas = 36210;
+        maxGas = 36161;
+        minGas = 36161;
     });
 
     it('approve', async () => {
         const amt = 100;
         await gem.mint(ALI, amt);
         gas    = await gem.estimateGas.approve(BOB, amt);
-        maxGas = 46117;
-        minGas = 46117;
+        maxGas = 46093;
+        minGas = 46093;
     });
 
     it('permit', async () => {
@@ -169,21 +169,21 @@ describe('gemfab', () => {
       const sig       = ethers.utils.splitSignature(signature)
 
       gas = await gem.connect(ali).estimateGas.permit(ALI, BOB, amt, deadline, sig.v, sig.r, sig.s);
-      maxGas = 74180; // ? variable sig size?
-      minGas = 74168;
+      maxGas = 74090; // ? variable sig size?
+      minGas = 74078;
     });
 
     it('rely', async () => {
       gas = await gem.estimateGas.rely(BOB);
-      maxGas = 48058;
-      minGas = 48058;
+      maxGas = 48031;
+      minGas = 48031;
     });
 
     it('deny', async () => {
       await send(gem.rely, BOB);
       gas = await gem.estimateGas.deny(BOB);
-      maxGas = 31050;
-      minGas = 31050;
+      maxGas = 31018;
+      minGas = 31018;
     });
   });
 
