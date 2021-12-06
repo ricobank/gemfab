@@ -172,6 +172,19 @@ describe('gemfab', () => {
       maxGas = 74180; // ? variable sig size?
       minGas = 74168;
     });
+
+    it('rely', async () => {
+      gas = await gem.estimateGas.rely(BOB);
+      maxGas = 48058;
+      minGas = 48058;
+    });
+
+    it('deny', async () => {
+      await send(gem.rely, BOB);
+      gas = await gem.estimateGas.deny(BOB);
+      maxGas = 31050;
+      minGas = 31050;
+    });
   });
 
   describe('rely/deny', () => {
