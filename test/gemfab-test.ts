@@ -191,20 +191,11 @@ describe('gemfab', () => {
     it('deny permissions', async function () {
       await fail('ErrAuth', gem.connect(bob).deny, ALI);
       await fail('ErrAuth', gem.connect(bob).deny, BOB);
-      want(await gem.wards(ALI)).to.equal(true);
       await send(gem.deny, BOB);
-      want(await gem.wards(ALI)).to.equal(true);
-      want(await gem.wards(BOB)).to.equal(false);
       await send(gem.rely, BOB);
-      want(await gem.wards(ALI)).to.equal(true);
-      want(await gem.wards(BOB)).to.equal(true);
       await send(gem.deny, BOB);
-      want(await gem.wards(ALI)).to.equal(true);
-      want(await gem.wards(BOB)).to.equal(false);
       await send(gem.deny, ALI);
       //lockout
-      want(await gem.wards(ALI)).to.equal(false);
-      want(await gem.wards(BOB)).to.equal(false);
       await fail('ErrAuth', gem.rely, ALI);
       await fail('ErrAuth', gem.connect(bob).rely, ALI);
     });
