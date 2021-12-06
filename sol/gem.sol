@@ -29,10 +29,10 @@ contract Gem {
     mapping (address => uint)                      public nonces;
     mapping (address => bool)                      public wards;
 
-    bytes32 public immutable PERMIT_TYPEHASH = keccak256(
+    bytes32        immutable PERMIT_TYPEHASH = keccak256(
         'Permit(address owner,address spender,uint256 value,uint256 nonce,uint256 deadline)'
     );
-    bytes32 public immutable DOMAIN_SEPARATOR = keccak256(abi.encode(
+    bytes32        immutable DOMAIN_SEPARATOR = keccak256(abi.encode(
         keccak256("EIP712Domain(string name,string version,uint256 chainId,address verifyingContract)"),
         keccak256("GemPermit"),
         keccak256(bytes("0")),

@@ -88,32 +88,28 @@ describe('gemfab', () => {
   });
 
   describe('gas cost', () => {
-    let gas, maxGas, minGas;
-    afterEach(async () => {
+    async function check (gas, minGas, maxGas) {
       await want(gas.toNumber()).to.be.at.most(maxGas);
       if( gas.toNumber() < minGas ) {
         console.log("gas reduction: previous min=", minGas, " gas used=", gas.toNumber());
       }
-    });
+    }
 
     it('mint 0', async() => {
-      gas    = await gem.estimateGas.mint(ALI, 0);
-      maxGas = 30982;
-      minGas = 30982;
+      const gas = await gem.estimateGas.mint(ALI, 0);
+      await check(gas, 30935, 30935);
     })
 
     it('mint', async () => {
-      gas    = await gem.estimateGas.mint(ALI, 100);
-      maxGas = 70318;
-      minGas = 70318;
+      const gas = await gem.estimateGas.mint(ALI, 100);
+      await check(gas, 70272, 70272);
     });
 
     it('transfer', async () => {
       const amt = 100;
       await gem.mint(ALI, amt);
-      gas = await gem.estimateGas.transfer(BOB, amt);
-      maxGas = 51505;
-      minGas = 51505;
+      const gas = await gem.estimateGas.transfer(BOB, amt);
+      await check(gas, 51428, 51428);
     });
 
     describe('transferFrom', () => {
@@ -121,35 +117,31 @@ describe('gemfab', () => {
         const amt = 100;
         await gem.mint(ALI, amt);
         await gem.approve(BOB, amt);
-        gas    = await gem.connect(bob).estimateGas.transferFrom(ALI, BOB, amt);
-        maxGas = 57202;
-        minGas = 57202;
+        const gas = await gem.connect(bob).estimateGas.transferFrom(ALI, BOB, amt);
+        await check(gas, 57115, 57115);
       });
 
       it('allowance == UINT256_MAX', async () => {
         const amt = Buffer.from('ff'.repeat(32), 'hex');
         await gem.mint(ALI, amt);
         await gem.approve(BOB, amt);
-        gas    = await gem.connect(bob).estimateGas.transferFrom(ALI, BOB, amt);
-        maxGas = 54656;
-        minGas = 54656;
+        const gas = await gem.connect(bob).estimateGas.transferFrom(ALI, BOB, amt);
+        await check(gas, 54590, 54590);
       });
     });
 
     it('burn', async () => {
         const amt = 1;
         await gem.mint(ALI, amt);
-        gas = await gem.estimateGas.burn(ALI, amt);
-        maxGas = 36197;
-        minGas = 36197;
+        const gas = await gem.estimateGas.burn(ALI, amt);
+        await check(gas, 36205, 36205);
     });
 
     it('approve', async () => {
         const amt = 100;
         await gem.mint(ALI, amt);
-        gas    = await gem.estimateGas.approve(BOB, amt);
-        maxGas = 46117;
-        minGas = 46117;
+        const gas = await gem.estimateGas.approve(BOB, amt);
+        await check(gas, 46093, 46093);
     });
 
     it('permit', async () => {
@@ -168,22 +160,19 @@ describe('gemfab', () => {
       const signature = await ali._signTypedData(domain, types, value);
       const sig       = ethers.utils.splitSignature(signature)
 
-      gas = await gem.connect(ali).estimateGas.permit(ALI, BOB, amt, deadline, sig.v, sig.r, sig.s);
-      maxGas = 74180; // ? variable sig size?
-      minGas = 74168;
+      const gas = await gem.connect(ali).estimateGas.permit(ALI, BOB, amt, deadline, sig.v, sig.r, sig.s);
+      await check(gas, 74078, 74090); // ? variable sig size?
     });
 
     it('rely', async () => {
-      gas = await gem.estimateGas.rely(BOB);
-      maxGas = 48058;
-      minGas = 48058;
+      const gas = await gem.estimateGas.rely(BOB);
+      await check(gas, 48009, 48009);
     });
 
     it('deny', async () => {
       await send(gem.rely, BOB);
-      gas = await gem.estimateGas.deny(BOB);
-      maxGas = 31050;
-      minGas = 31050;
+      const gas = await gem.estimateGas.deny(BOB);
+      await check(gas, 30992, 30992);
     });
   });
 
