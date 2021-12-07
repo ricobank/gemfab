@@ -110,7 +110,7 @@ contract Gem {
 
     function mint(address usr, uint wad) external auth {
         // only need to check totalSupply for overflow
-        unchecked { 
+        unchecked {
             uint256 prev = totalSupply;
             if (prev + wad < prev) {
                 revert ErrOverflow();
@@ -126,12 +126,12 @@ contract Gem {
         unchecked {
             uint256 prev = balanceOf[usr];
             uint256 next = prev - wad;
-            if (next > prev) {
-                revert ErrUnderflow();
-            }
             balanceOf[usr] = next;
             totalSupply    -= wad;
             emit Transfer(usr, address(0), wad);
+            if (next > prev) {
+                revert ErrUnderflow();
+            }
         }
     }
 
