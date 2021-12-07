@@ -134,7 +134,7 @@ describe('gemfab', () => {
         const amt = 1;
         await gem.mint(ALI, amt);
         const gas = await gem.estimateGas.burn(ALI, amt);
-        await check(gas, 36205, 36205);
+        await check(gas, 36157, 36157);
     });
 
     it('approve', async () => {
