@@ -87,23 +87,23 @@ contract Gem {
     }
 
     function transferFrom(address src, address dst, uint wad)
-        external returns (bool)
+        external returns (bool res)
     {
         unchecked {
             uint256 prev = allowance[src][msg.sender];
             if ( prev != type(uint256).max ) {
+                allowance[src][msg.sender] = prev - wad;
                 if( prev < wad ) {
                     revert ErrUnderflow();
                 }
-                allowance[src][msg.sender] = prev - wad;
             }
             prev = balanceOf[src];
-            if( prev < wad ) {
-                revert ErrUnderflow();
-            }
             balanceOf[src]  = prev - wad;
             balanceOf[dst] += wad;
             emit Transfer(src, dst, wad);
+            if( prev < wad ) {
+                revert ErrUnderflow();
+            }
             return true;
         }
     }
