@@ -109,7 +109,7 @@ describe('gemfab', () => {
       const amt = 100;
       await gem.mint(ALI, amt);
       const gas = await gem.estimateGas.transfer(BOB, amt);
-      await check(gas, 51428, 51428);
+      await check(gas, 51377, 51377);
     });
 
     describe('transferFrom', () => {

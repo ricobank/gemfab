@@ -76,12 +76,12 @@ contract Gem {
     function transfer(address dst, uint wad) external returns (bool) {
         unchecked {
             uint256 prev = balanceOf[msg.sender];
-            if( prev < wad ) {
-                revert ErrUnderflow();
-            }
             balanceOf[msg.sender] = prev - wad;
             balanceOf[dst]       += wad;
             emit Transfer(msg.sender, dst, wad);
+            if( prev < wad ) {
+                revert ErrUnderflow();
+            }
             return true;
         }
     }
