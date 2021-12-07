@@ -71,41 +71,41 @@ contract Gem {
     function transfer(address dst, uint wad) external returns (bool) {
         unchecked {
             uint256 prev = balanceOf[msg.sender];
-            if( prev < wad ) {
-                revert ErrUnderflow();
-            }
             balanceOf[msg.sender] = prev - wad;
             balanceOf[dst]       += wad;
             emit Transfer(msg.sender, dst, wad);
+            if( prev < wad ) {
+                revert ErrUnderflow();
+            }
             return true;
         }
     }
 
     function transferFrom(address src, address dst, uint wad)
-        external returns (bool)
+        external returns (bool res)
     {
         unchecked {
             uint256 prev = allowance[src][msg.sender];
             if ( prev != type(uint256).max ) {
+                allowance[src][msg.sender] = prev - wad;
                 if( prev < wad ) {
                     revert ErrUnderflow();
                 }
-                allowance[src][msg.sender] = prev - wad;
             }
             prev = balanceOf[src];
-            if( prev < wad ) {
-                revert ErrUnderflow();
-            }
             balanceOf[src]  = prev - wad;
             balanceOf[dst] += wad;
             emit Transfer(src, dst, wad);
+            if( prev < wad ) {
+                revert ErrUnderflow();
+            }
             return true;
         }
     }
 
     function mint(address usr, uint wad) external auth {
         // only need to check totalSupply for overflow
-        unchecked { 
+        unchecked {
             uint256 prev = totalSupply;
             if (prev + wad < prev) {
                 revert ErrOverflow();
@@ -121,12 +121,12 @@ contract Gem {
         unchecked {
             uint256 prev = balanceOf[usr];
             uint256 next = prev - wad;
-            if (next > prev) {
-                revert ErrUnderflow();
-            }
             balanceOf[usr] = next;
             totalSupply    -= wad;
             emit Transfer(usr, address(0), wad);
+            if (next > prev) {
+                revert ErrUnderflow();
+            }
         }
     }
 
