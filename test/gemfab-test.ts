@@ -95,6 +95,12 @@ describe('gemfab', () => {
       }
     }
 
+    beforeEach(async () => {
+      // set balanceOf and totalSupply because first assign is most expensive
+      await send(gem.mint, ALI, 1);
+      await send(gem.mint, BOB, 1);
+    })
+
     it('mint 0', async() => {
       const gas = await gem.estimateGas.mint(ALI, 0);
       await check(gas, 30935, 30935);
@@ -102,14 +108,14 @@ describe('gemfab', () => {
 
     it('mint', async () => {
       const gas = await gem.estimateGas.mint(ALI, 100);
-      await check(gas, 70272, 70272);
+      await check(gas, 36072, 36072);
     });
 
     it('transfer', async () => {
       const amt = 100;
       await gem.mint(ALI, amt);
       const gas = await gem.estimateGas.transfer(BOB, amt);
-      await check(gas, 51428, 51428);
+      await check(gas, 34059, 34059);
     });
 
     describe('transferFrom', () => {
@@ -118,10 +124,12 @@ describe('gemfab', () => {
         await gem.mint(ALI, amt);
         await gem.approve(BOB, amt);
         const gas = await gem.connect(bob).estimateGas.transferFrom(ALI, BOB, amt);
-        await check(gas, 57115, 57115);
+        await check(gas, 40118, 40118);
       });
 
       it('allowance == UINT256_MAX', async () => {
+        await send(gem.burn, ALI, 1);
+        await send(gem.burn, BOB, 1);
         const amt = Buffer.from('ff'.repeat(32), 'hex');
         await gem.mint(ALI, amt);
         await gem.approve(BOB, amt);
