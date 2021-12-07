@@ -128,13 +128,11 @@ describe('gemfab', () => {
       });
 
       it('allowance == UINT256_MAX', async () => {
-        await send(gem.burn, ALI, 1);
-        await send(gem.burn, BOB, 1);
-        const amt = Buffer.from('ff'.repeat(32), 'hex');
+        const amt = 100;
         await gem.mint(ALI, amt);
-        await gem.approve(BOB, amt);
+        await gem.approve(BOB, Buffer.from('ff'.repeat(32), 'hex'));
         const gas = await gem.connect(bob).estimateGas.transferFrom(ALI, BOB, amt);
-        await check(gas, 54590, 54590);
+        await check(gas, 36886, 36886);
       });
     });
 
