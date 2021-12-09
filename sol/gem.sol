@@ -16,7 +16,7 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-pragma solidity 0.8.9;
+pragma solidity 0.8.10;
 
 contract Gem {
     string  public name;
@@ -29,10 +29,10 @@ contract Gem {
     mapping (address => uint)                      public nonces;
     mapping (address => bool)                      public wards;
 
-    bytes32 public immutable PERMIT_TYPEHASH = keccak256(
+    bytes32        immutable PERMIT_TYPEHASH = keccak256(
         'Permit(address owner,address spender,uint256 value,uint256 nonce,uint256 deadline)'
     );
-    bytes32 public immutable DOMAIN_SEPARATOR = keccak256(abi.encode(
+    bytes32        immutable DOMAIN_SEPARATOR = keccak256(abi.encode(
         keccak256("EIP712Domain(string name,string version,uint256 chainId,address verifyingContract)"),
         keccak256("GemPermit"),
         keccak256(bytes("0")),
@@ -73,34 +73,34 @@ contract Gem {
     function transfer(address dst, uint wad) external returns (bool) {
         unchecked {
             uint256 prev = balanceOf[msg.sender];
-            if( prev < wad ) {
-                revert ErrUnderflow();
-            }
             balanceOf[msg.sender] = prev - wad;
             balanceOf[dst]       += wad;
             emit Transfer(msg.sender, dst, wad);
+            if( prev < wad ) {
+                revert ErrUnderflow();
+            }
             return true;
         }
     }
 
     function transferFrom(address src, address dst, uint wad)
-        external returns (bool)
+        external returns (bool res)
     {
         unchecked {
             uint256 prev = allowance[src][msg.sender];
             if ( prev != type(uint256).max ) {
+                allowance[src][msg.sender] = prev - wad;
                 if( prev < wad ) {
                     revert ErrUnderflow();
                 }
-                allowance[src][msg.sender] = prev - wad;
             }
             prev = balanceOf[src];
-            if( prev < wad ) {
-                revert ErrUnderflow();
-            }
             balanceOf[src]  = prev - wad;
             balanceOf[dst] += wad;
             emit Transfer(src, dst, wad);
+            if( prev < wad ) {
+                revert ErrUnderflow();
+            }
             return true;
         }
     }
@@ -108,7 +108,7 @@ contract Gem {
     function mint(address usr, uint wad) external {
         if (!wards[msg.sender]) revert ErrAuth(msg.sig);
         // only need to check totalSupply for overflow
-        unchecked { 
+        unchecked {
             uint256 prev = totalSupply;
             if (prev + wad < prev) {
                 revert ErrOverflow();
@@ -125,12 +125,12 @@ contract Gem {
         unchecked {
             uint256 prev = balanceOf[usr];
             uint256 next = prev - wad;
-            if (next > prev) {
-                revert ErrUnderflow();
-            }
             balanceOf[usr] = next;
             totalSupply    -= wad;
             emit Transfer(usr, address(0), wad);
+            if (next > prev) {
+                revert ErrUnderflow();
+            }
         }
     }
 

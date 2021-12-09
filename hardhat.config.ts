@@ -12,11 +12,11 @@ export default {
     sources: "./sol"
   },
   solidity: {
-    version: '0.8.9',
+    version: '0.8.10',
     settings: {
       optimizer: {
         enabled: true,
-        runs: 2000
+        runs: 20000
       }
     }
   }
