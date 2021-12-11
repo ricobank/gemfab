@@ -63,14 +63,9 @@ contract Gem {
         emit Ward(msg.sender, msg.sender, true);
     }
 
-    function rely(address usr) external auth {
-        wards[usr] = true;
-        emit Ward(msg.sender, usr, true);
-    }
-
-    function deny(address usr) external auth {
-        wards[usr] = false;
-        emit Ward(msg.sender, usr, false);
+    function ward(address usr, bool authed) external auth {
+        wards[usr] = authed;
+        emit Ward(msg.sender, usr, authed);
     }
 
     function transfer(address dst, uint wad) external returns (bool) {
@@ -157,7 +152,6 @@ contract Gem {
         allowance[owner][spender] = value;
         emit Approval(owner, spender, value);
     }
-
 }
 
 contract GemFab {
@@ -167,8 +161,8 @@ contract GemFab {
 
     function build(string memory name, string memory symbol) public returns (Gem gem) {
         gem = new Gem(name, symbol);
-        gem.rely(msg.sender);
-        gem.deny(address(this));
+        gem.ward(msg.sender, true);
+        gem.ward(address(this), false);
         built[address(gem)] = true;
         emit Build(msg.sender, address(gem), symbol);
         return gem;

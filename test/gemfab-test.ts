@@ -99,26 +99,26 @@ describe('gemfab', () => {
       describe('change', () => {
         it('zero to nonzero', async () => {
           const gas = await gem.estimateGas.mint(ALI, 1);
-          await check(gas, 70272, 70272);
+          await check(gas, 70294, 70294);
         })
 
         it('nonzero to nonzero', async () => {
           await send(gem.mint, ALI, 1);
           const gas = await gem.estimateGas.mint(ALI, 1);
-          await check(gas, 36072, 36072);
+          await check(gas, 36094, 36094);
         });
       })
 
       describe('no change', () => {
         it('no change zero', async () => {
           const gas = await gem.estimateGas.mint(ALI, 0);
-          await check(gas, 30935, 30935);
+          await check(gas, 30958, 30958);
         })
 
         it('no change nonzero', async () => {
           await send(gem.mint, ALI, 1);
           const gas = await gem.estimateGas.mint(ALI, 0);
-          await check(gas, 30935, 30935);
+          await check(gas, 30958, 30958);
         })
       })
     });
@@ -181,7 +181,6 @@ describe('gemfab', () => {
       })
     })
 
-
     describe('transferFrom ali->bob', () => {
       describe('allowance < UINT256_MAX', () => {
         describe('change', () => {
@@ -191,7 +190,7 @@ describe('gemfab', () => {
             await send(gem.mint, ALI, 1);
             await send(gem.approve, BOB, allowance);
             const gas = await gem.connect(bob).estimateGas.transferFrom(ALI, BOB, 1);
-            await check(gas, 57016, 57016);
+            await check(gas, 56936, 56936);
           })
           // 01
           it('nonzero to zero ali, nonzero to nonzero bob', async () => {
@@ -199,14 +198,14 @@ describe('gemfab', () => {
             await send(gem.mint, BOB, 1);
             await send(gem.approve, BOB, allowance);
             const gas = await gem.connect(bob).estimateGas.transferFrom(ALI, BOB, 1);
-            await check(gas, 39891, 39891);
+            await check(gas, 39825, 39825);
           })
           // 10
           it('nonzero to nonzero ali, zero to nonzero bob', async () => {
             await send(gem.mint, ALI, 2);
             await send(gem.approve, BOB, allowance);
             const gas = await gem.connect(bob).estimateGas.transferFrom(ALI, BOB, 1);
-            await check(gas, 57083, 57083);
+            await check(gas, 57010, 57010);
           })
           // 11
           it('nonzero to nonzero ali, nonzero to nonzero bob', async () => {
@@ -214,7 +213,7 @@ describe('gemfab', () => {
             await send(gem.mint, BOB, 1);
             await send(gem.approve, BOB, allowance);
             const gas = await gem.connect(bob).estimateGas.transferFrom(ALI, BOB, 1);
-            await check(gas, 40025, 40025);
+            await check(gas, 39949, 39949);
           })
         })
       })
@@ -226,7 +225,7 @@ describe('gemfab', () => {
             await send(gem.mint, ALI, 1);
             await send(gem.approve, BOB, allowance);
             const gas = await gem.connect(bob).estimateGas.transferFrom(ALI, BOB, 1);
-            await check(gas, 54091, 54091);
+            await check(gas, 54017, 54017);
           })
           // 01
           it('nonzero to zero ali, nonzero to nonzero bob', async () => {
@@ -234,14 +233,14 @@ describe('gemfab', () => {
             await send(gem.mint, BOB, 1);
             await send(gem.approve, BOB, allowance);
             const gas = await gem.connect(bob).estimateGas.transferFrom(ALI, BOB, 1);
-            await check(gas, 37005, 37005);
+            await check(gas, 36928, 36928);
           })
           // 10
           it('nonzero to nonzero ali, zero to nonzero bob', async () => {
             await send(gem.mint, ALI, 2);
             await send(gem.approve, BOB, allowance);
             const gas = await gem.connect(bob).estimateGas.transferFrom(ALI, BOB, 1);
-            await check(gas, 53905, 53905);
+            await check(gas, 53838, 53838);
           })
           // 11
           it('nonzero to nonzero ali, nonzero to nonzero bob', async () => {
@@ -249,7 +248,7 @@ describe('gemfab', () => {
             await send(gem.mint, BOB, 1);
             await send(gem.approve, BOB, allowance);
             const gas = await gem.connect(bob).estimateGas.transferFrom(ALI, BOB, 1);
-            await check(gas, 36805, 36805);
+            await check(gas, 36738, 36738);
           })
         })
       })
@@ -260,18 +259,18 @@ describe('gemfab', () => {
         it('nonzero to zero', async () => {
           await send(gem.mint, ALI, 1);
           const gas = await gem.estimateGas.burn(ALI, 1);
-          await check(gas, 36157, 36157);
+          await check(gas, 36135, 36135);
         })
       })
       describe('no change', () => {
         it('nonzero to nonzero', async () => {
           await send(gem.mint, ALI, 1);
           const gas = await gem.estimateGas.burn(ALI, 0);
-          await check(gas, 31022, 31022);
+          await check(gas, 30999, 30999);
         })
         it('zero to zero', async () => {
           const gas = await gem.estimateGas.burn(ALI, 0);
-          await check(gas, 31022, 31022);
+          await check(gas, 30999, 30999);
         })
       })
     });
@@ -363,67 +362,67 @@ describe('gemfab', () => {
 
     describe('rely', () => {
       it('change', async () => {
-        const gas = await gem.estimateGas.rely(BOB);
-        await check(gas, 48009, 48009);
+        const gas = await gem.estimateGas.ward(BOB, true);
+        await check(gas, 48238, 48238);
       })
       it('no change', async () => {
-        await send(gem.rely, BOB);
-        const gas = await gem.estimateGas.rely(BOB);
-        await check(gas, 28548, 28548);
+        await send(gem.ward, BOB, true);
+        const gas = await gem.estimateGas.ward(BOB, true);
+        await check(gas, 28780, 28780);
       })
     });
 
     describe('deny', () => {
       it('change', async () => {
-        await send(gem.rely, BOB);
-        const gas = await gem.estimateGas.deny(BOB);
-        await check(gas, 30992, 30992);
+        await send(gem.ward, BOB, true);
+        const gas = await gem.estimateGas.ward(BOB, false);
+        await check(gas, 31261, 31261);
       })
       it('no change', async () => {
-        const gas = await gem.estimateGas.deny(BOB);
-        await check(gas, 28538, 28538);
+        const gas = await gem.estimateGas.ward(BOB, false);
+        await check(gas, 28768, 28768);
       })
     });
   });
 
   describe('rely/deny', () => {
     it('deny permissions', async function () {
-      await fail('ErrAuth', gem.connect(bob).deny, ALI);
-      await fail('ErrAuth', gem.connect(bob).deny, BOB);
+      await fail('ErrAuth', gem.connect(bob).ward, ALI, false);
+      await fail('ErrAuth', gem.connect(bob).ward, BOB, false);
       want(await gem.wards(ALI)).to.equal(true);
-      await send(gem.deny, BOB);
+      await send(gem.ward, BOB, false);
       want(await gem.wards(ALI)).to.equal(true);
       want(await gem.wards(BOB)).to.equal(false);
-      await send(gem.rely, BOB);
+      await send(gem.ward, BOB, true);
       want(await gem.wards(ALI)).to.equal(true);
       want(await gem.wards(BOB)).to.equal(true);
-      await send(gem.deny, BOB);
+      await send(gem.ward, BOB, false);
       want(await gem.wards(ALI)).to.equal(true);
       want(await gem.wards(BOB)).to.equal(false);
-      await send(gem.deny, ALI);
+      await send(gem.ward, ALI, false);
       //lockout
       want(await gem.wards(ALI)).to.equal(false);
       want(await gem.wards(BOB)).to.equal(false);
-      await fail('ErrAuth', gem.rely, ALI);
-      await fail('ErrAuth', gem.connect(bob).rely, ALI);
+      await fail('ErrAuth', gem.ward, ALI, true);
+      await fail('ErrAuth', gem.connect(bob).ward, ALI, true);
     });
 
     it('lockout example', async function () {
       await send(gem.mint, ALI, 1);
-      await gem.connect(bob).deny(ALI).then((res) => {}, (err) => {});
+      await gem.connect(bob).ward(ALI, false).then((res) => {}, (err) => {});
       await send(gem.mint, ALI, 1);
     });
 
     it('burn', async function () {
       await send(gem.mint, ALI, 1);
       await fail('ErrAuth', gem.connect(bob).burn, ALI, 1);
-      await send(gem.rely, BOB);
+      await send(gem.ward, BOB, true);
       await send(gem.connect(bob).burn, ALI, 1);
     });
 
     it('mint', async function () {
       await fail('ErrAuth', gem.connect(bob).burn, ALI, 1);
-      await send(gem.rely, BOB);
+      await send(gem.ward, BOB, true);
       await send(gem.connect(bob).mint, ALI, 1);
     });
 
@@ -443,7 +442,7 @@ describe('gemfab', () => {
       const gembob = gem.connect(bob);
 
       // pass with bob denied
-      await send(gem.deny, BOB);
+      await send(gem.ward, BOB, false);
       await send(gembob.transfer, ALI, 1);
       await send(gembob.approve, ALI, 1);
       await send(gembob.approve, BOB, 1);
@@ -453,7 +452,7 @@ describe('gemfab', () => {
       await send(gem.connect(bob).permit, ALI, BOB, amt, deadline, sig.v, sig.r, sig.s);
 
       // pass with bob relied
-      await send(gem.rely, BOB);
+      await send(gem.ward, BOB, true);
       await send(gembob.transfer, ALI, 1);
       await send(gembob.approve, ALI, 1);
       await send(gembob.approve, BOB, 1);
