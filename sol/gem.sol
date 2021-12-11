@@ -48,10 +48,10 @@ contract Gem {
     error ErrPermitSignature();
     error ErrOverflow();
     error ErrUnderflow();
-    error ErrAuth(bytes4 sig);
+    error ErrAuth();
 
     modifier auth() {
-        if (!wards[msg.sender]) revert ErrAuth(msg.sig);
+        if (!wards[msg.sender]) revert ErrAuth();
         _;
     }
 
