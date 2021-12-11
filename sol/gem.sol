@@ -91,7 +91,7 @@ contract Gem {
 
     function transferFrom(address src, address dst, uint wad)
       external payable
-      returns (bool res)
+      returns (bool)
     {
         unchecked {
             uint256 prev = allowance[src][msg.sender];
