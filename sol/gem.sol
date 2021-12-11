@@ -50,11 +50,6 @@ contract Gem {
     error ErrUnderflow();
     error ErrAuth();
 
-    modifier auth() {
-        if (!wards[msg.sender]) revert ErrAuth();
-        _;
-    }
-
     constructor(string memory name_, string memory symbol_)
       payable
     {
@@ -67,11 +62,45 @@ contract Gem {
 
     function ward(address usr, bool authed)
       external payable
-      auth
     {
+        if (!wards[msg.sender]) revert ErrAuth();
         wards[usr] = authed;
         emit Ward(msg.sender, usr, authed);
     }
+
+    function mint(address usr, uint wad)
+      external payable
+    {
+        if (!wards[msg.sender]) revert ErrAuth();
+        // only need to check totalSupply for overflow
+        unchecked {
+            uint256 prev = totalSupply;
+            if (prev + wad < prev) {
+                revert ErrOverflow();
+            }
+            balanceOf[usr] += wad;
+            totalSupply     = prev + wad;
+            emit Transfer(address(0), usr, wad);
+        }
+    }
+
+    function burn(address usr, uint wad)
+      external payable
+    {
+        if (!wards[msg.sender]) revert ErrAuth();
+        // only need to check balanceOf[usr] for underflow
+        unchecked {
+            uint256 prev = balanceOf[usr];
+            uint256 next = prev - wad;
+            balanceOf[usr] = next;
+            totalSupply    -= wad;
+            emit Transfer(usr, address(0), wad);
+            if (next > prev) {
+                revert ErrUnderflow();
+            }
+        }
+    }
+
 
     function transfer(address dst, uint wad)
       external payable
@@ -112,39 +141,6 @@ contract Gem {
         }
     }
 
-    function mint(address usr, uint wad)
-      external payable
-      auth
-    {
-        // only need to check totalSupply for overflow
-        unchecked {
-            uint256 prev = totalSupply;
-            if (prev + wad < prev) {
-                revert ErrOverflow();
-            }
-            balanceOf[usr] += wad;
-            totalSupply     = prev + wad;
-            emit Transfer(address(0), usr, wad);
-        }
-    }
-
-    function burn(address usr, uint wad)
-      external payable
-      auth
-    {
-        // only need to check balanceOf[usr] for underflow
-        unchecked {
-            uint256 prev = balanceOf[usr];
-            uint256 next = prev - wad;
-            balanceOf[usr] = next;
-            totalSupply    -= wad;
-            emit Transfer(usr, address(0), wad);
-            if (next > prev) {
-                revert ErrUnderflow();
-            }
-        }
-    }
-
     function approve(address usr, uint wad)
       external payable
       returns (bool)
@@ -171,6 +167,7 @@ contract Gem {
         allowance[owner][spender] = value;
         emit Approval(owner, spender, value);
     }
+
 }
 
 contract GemFab {
