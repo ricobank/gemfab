@@ -29,10 +29,10 @@ contract Gem {
     mapping (address => uint)                      public nonces;
     mapping (address => bool)                      public wards;
 
-    bytes32        immutable PERMIT_TYPEHASH = keccak256(
+    bytes32 immutable PERMIT_TYPEHASH = keccak256(
         'Permit(address owner,address spender,uint256 value,uint256 nonce,uint256 deadline)'
     );
-    bytes32        immutable DOMAIN_SEPARATOR = keccak256(abi.encode(
+    bytes32 immutable DOMAIN_SEPARATOR = keccak256(abi.encode(
         keccak256("EIP712Domain(string name,string version,uint256 chainId,address verifyingContract)"),
         keccak256("GemPermit"),
         keccak256(bytes("0")),
@@ -157,14 +157,14 @@ contract Gem {
 contract GemFab {
     mapping(address=>bool) public built;
 
-    event Build(address indexed caller, address indexed gem, string symbol);
+    event Build(address indexed caller, address indexed gem);
 
     function build(string memory name, string memory symbol) public returns (Gem gem) {
         gem = new Gem(name, symbol);
         gem.ward(msg.sender, true);
         gem.ward(address(this), false);
         built[address(gem)] = true;
-        emit Build(msg.sender, address(gem), symbol);
+        emit Build(msg.sender, address(gem));
         return gem;
     }
 }
