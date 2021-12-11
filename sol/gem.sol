@@ -42,7 +42,7 @@ contract Gem {
 
     event Approval(address indexed src, address indexed usr, uint wad);
     event Transfer(address indexed src, address indexed dst, uint wad);
-    event Ward(address indexed caller, address indexed code, bool trusts);
+    event Ward(address indexed setter, address indexed user, bool authed);
  
     error ErrPermitDeadline();
     error ErrPermitSignature();
