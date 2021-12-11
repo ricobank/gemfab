@@ -42,7 +42,7 @@ contract Gem {
 
     event Approval(address indexed src, address indexed usr, uint wad);
     event Transfer(address indexed src, address indexed dst, uint wad);
-    event Ward(address indexed caller, address indexed trusts, bool bit);
+    event Ward(address indexed caller, address indexed code, bool trusts);
  
     error ErrPermitDeadline();
     error ErrPermitSignature();
@@ -55,7 +55,7 @@ contract Gem {
         _;
     }
 
-    constructor(string memory name_, string memory symbol_) {
+    constructor(string memory name_, string memory symbol_) payable {
         name = name_;
         symbol = symbol_;
 
@@ -63,12 +63,12 @@ contract Gem {
         emit Ward(msg.sender, msg.sender, true);
     }
 
-    function ward(address usr, bool authed) external auth {
+    function ward(address usr, bool authed) external payable auth {
         wards[usr] = authed;
         emit Ward(msg.sender, usr, authed);
     }
 
-    function transfer(address dst, uint wad) external returns (bool) {
+    function transfer(address dst, uint wad) external payable returns (bool) {
         unchecked {
             uint256 prev = balanceOf[msg.sender];
             balanceOf[msg.sender] = prev - wad;
@@ -82,7 +82,7 @@ contract Gem {
     }
 
     function transferFrom(address src, address dst, uint wad)
-        external returns (bool res)
+        external payable returns (bool res)
     {
         unchecked {
             uint256 prev = allowance[src][msg.sender];
@@ -103,7 +103,7 @@ contract Gem {
         }
     }
 
-    function mint(address usr, uint wad) external auth {
+    function mint(address usr, uint wad) external payable auth {
         // only need to check totalSupply for overflow
         unchecked {
             uint256 prev = totalSupply;
@@ -116,7 +116,7 @@ contract Gem {
         }
     }
 
-    function burn(address usr, uint wad) external auth {
+    function burn(address usr, uint wad) external payable auth {
         // only need to check balanceOf[usr] for underflow
         unchecked {
             uint256 prev = balanceOf[usr];
@@ -130,7 +130,7 @@ contract Gem {
         }
     }
 
-    function approve(address usr, uint wad) external returns (bool) {
+    function approve(address usr, uint wad) external payable returns (bool) {
         allowance[msg.sender][usr] = wad;
         emit Approval(msg.sender, usr, wad);
         return true;
@@ -138,7 +138,7 @@ contract Gem {
 
     // EIP-2612
     function permit(address owner, address spender, uint256 value, uint256 deadline,
-                    uint8 v, bytes32 r, bytes32 s) external
+                    uint8 v, bytes32 r, bytes32 s) external payable
     {
         uint nonce = nonces[owner];
         bytes32 digest = keccak256(abi.encodePacked( "\x19\x01", DOMAIN_SEPARATOR,
