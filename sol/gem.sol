@@ -152,15 +152,17 @@ contract Gem {
                     uint8 v, bytes32 r, bytes32 s)
       payable external
     {
-        uint nonce = nonces[owner];
-        unchecked {
-            nonces[owner] = nonce + 1;
-        }
         allowance[owner][spender] = value;
         emit Approval(owner, spender, value);
-        bytes32 digest = keccak256(abi.encodePacked( "\x19\x01", DOMAIN_SEPARATOR,
-            keccak256(abi.encode( PERMIT_TYPEHASH, owner, spender, value, nonce, deadline ))));
-        address signer = ecrecover(digest, v, r, s);
+        address signer;
+        unchecked {
+            signer = ecrecover(
+                keccak256(abi.encodePacked( "\x19\x01", DOMAIN_SEPARATOR,
+                    keccak256(abi.encode( PERMIT_TYPEHASH, owner, spender,
+                        value, nonces[owner]++, deadline )))),
+                v, r, s
+            );
+        }
         if (signer == address(0)) { revert ErrPermitSignature(); }
         if (owner != signer) { revert ErrPermitSignature(); }
         if (block.timestamp > deadline) { revert ErrPermitDeadline(); }

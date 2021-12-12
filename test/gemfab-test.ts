@@ -330,32 +330,32 @@ describe('gemfab', () => {
         it('zero to nonzero', async () => {
           value.value = 1;
           const gas   = await doPermit();
-          await check(gas, 73992, 74004); // ? variable sig size?
+          await check(gas, 73947, 73971); // ? variable sig size?
         });
         it('nonzero to zero', async () => {
           await send(gem.approve, BOB, 1)
           value.value = 0;
           const gas   = await doPermit();
-          await check(gas, 56962, 56975); // ? variable sig size?
+          await check(gas, 56913, 56939); // ? variable sig size?
         });
         it('nonzero to nonzero', async () => {
           await send(gem.approve, BOB, 1)
           value.value = 2;
           const gas   = await doPermit();
-          await check(gas, 56892, 56904); // ? variable sig size?
+          await check(gas, 56859, 56871); // ? variable sig size?
         });
       })
       describe('no change', () => {
         it('zero to zero', async () => {
           value.value = 0;
           const gas   = await doPermit();
-          await check(gas, 54080, 54092); // ? variable sig size?
+          await check(gas, 54035, 54059); // ? variable sig size?
         });
         it('nonzero to nonzero', async () => {
           await send(gem.approve, BOB, 1);
           value.value = 1;
           const gas   = await doPermit();
-          await check(gas, 54092, 54104); // ? variable sig size?
+          await check(gas, 54047, 54071); // ? variable sig size?
         });
       })
     })
