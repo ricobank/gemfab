@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-// Copyright (C) monospace
+// Copyright (C) 2021 kevin and his friends
 // Copyright (C) 2017, 2018, 2019 dbrock, rain, mrchico
 
 // This program is free software: you can redistribute it and/or modify
@@ -61,7 +61,7 @@ contract Gem {
     }
 
     function ward(address usr, bool authed)
-      external payable
+      payable external
     {
         if (!wards[msg.sender]) revert ErrWard();
         wards[usr] = authed;
@@ -69,7 +69,7 @@ contract Gem {
     }
 
     function mint(address usr, uint wad)
-      external payable
+      payable external
     {
         if (!wards[msg.sender]) revert ErrWard();
         // only need to check totalSupply for overflow
@@ -85,7 +85,7 @@ contract Gem {
     }
 
     function burn(address usr, uint wad)
-      external payable
+      payable external
     {
         if (!wards[msg.sender]) revert ErrWard();
         // only need to check balanceOf[usr] for underflow
@@ -103,8 +103,7 @@ contract Gem {
 
 
     function transfer(address dst, uint wad)
-      external payable
-      returns (bool)
+      payable external returns (bool)
     {
         unchecked {
             uint256 prev = balanceOf[msg.sender];
@@ -119,8 +118,7 @@ contract Gem {
     }
 
     function transferFrom(address src, address dst, uint wad)
-      external payable
-      returns (bool)
+      payable external returns (bool)
     {
         unchecked {
             uint256 prev = allowance[src][msg.sender];
@@ -142,8 +140,7 @@ contract Gem {
     }
 
     function approve(address usr, uint wad)
-      external payable
-      returns (bool)
+      payable external returns (bool)
     {
         allowance[msg.sender][usr] = wad;
         emit Approval(msg.sender, usr, wad);
@@ -153,7 +150,7 @@ contract Gem {
     // EIP-2612
     function permit(address owner, address spender, uint256 value, uint256 deadline,
                     uint8 v, bytes32 r, bytes32 s)
-      external payable
+      payable external
     {
         uint nonce = nonces[owner];
         bytes32 digest = keccak256(abi.encodePacked( "\x19\x01", DOMAIN_SEPARATOR,
@@ -176,8 +173,7 @@ contract GemFab {
     event Build(address indexed caller, address indexed gem);
 
     function build(string memory name, string memory symbol)
-      external payable
-      returns (Gem gem)
+      payable external returns (Gem gem)
     {
         gem = new Gem(name, symbol);
         gem.ward(msg.sender, true);
