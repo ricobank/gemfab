@@ -58,7 +58,7 @@ describe('gemfab', () => {
     want(bal.toNumber()).equal(100)
 
     const gembob = gem.connect(bob)
-    await fail('ErrAuth', gembob.mint, BOB, 100)
+    await fail('ErrWard', gembob.mint, BOB, 100)
   })
 
   it('burn underflow', async () => {
@@ -387,8 +387,8 @@ describe('gemfab', () => {
 
   describe('rely/deny', () => {
     it('deny permissions', async function () {
-      await fail('ErrAuth', gem.connect(bob).ward, ALI, false);
-      await fail('ErrAuth', gem.connect(bob).ward, BOB, false);
+      await fail('ErrWard', gem.connect(bob).ward, ALI, false);
+      await fail('ErrWard', gem.connect(bob).ward, BOB, false);
       want(await gem.wards(ALI)).to.equal(true);
       await send(gem.ward, BOB, false);
       want(await gem.wards(ALI)).to.equal(true);
@@ -403,8 +403,8 @@ describe('gemfab', () => {
       //lockout
       want(await gem.wards(ALI)).to.equal(false);
       want(await gem.wards(BOB)).to.equal(false);
-      await fail('ErrAuth', gem.ward, ALI, true);
-      await fail('ErrAuth', gem.connect(bob).ward, ALI, true);
+      await fail('ErrWard', gem.ward, ALI, true);
+      await fail('ErrWard', gem.connect(bob).ward, ALI, true);
     });
 
     it('lockout example', async function () {
@@ -415,13 +415,13 @@ describe('gemfab', () => {
 
     it('burn', async function () {
       await send(gem.mint, ALI, 1);
-      await fail('ErrAuth', gem.connect(bob).burn, ALI, 1);
+      await fail('ErrWard', gem.connect(bob).burn, ALI, 1);
       await send(gem.ward, BOB, true);
       await send(gem.connect(bob).burn, ALI, 1);
     });
 
     it('mint', async function () {
-      await fail('ErrAuth', gem.connect(bob).burn, ALI, 1);
+      await fail('ErrWard', gem.connect(bob).burn, ALI, 1);
       await send(gem.ward, BOB, true);
       await send(gem.connect(bob).mint, ALI, 1);
     });

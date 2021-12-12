@@ -48,7 +48,7 @@ contract Gem {
     error ErrPermitSignature();
     error ErrOverflow();
     error ErrUnderflow();
-    error ErrAuth();
+    error ErrWard();
 
     constructor(string memory name_, string memory symbol_)
       payable
@@ -63,7 +63,7 @@ contract Gem {
     function ward(address usr, bool authed)
       external payable
     {
-        if (!wards[msg.sender]) revert ErrAuth();
+        if (!wards[msg.sender]) revert ErrWard();
         wards[usr] = authed;
         emit Ward(msg.sender, usr, authed);
     }
@@ -71,7 +71,7 @@ contract Gem {
     function mint(address usr, uint wad)
       external payable
     {
-        if (!wards[msg.sender]) revert ErrAuth();
+        if (!wards[msg.sender]) revert ErrWard();
         // only need to check totalSupply for overflow
         unchecked {
             uint256 prev = totalSupply;
@@ -87,7 +87,7 @@ contract Gem {
     function burn(address usr, uint wad)
       external payable
     {
-        if (!wards[msg.sender]) revert ErrAuth();
+        if (!wards[msg.sender]) revert ErrWard();
         // only need to check balanceOf[usr] for underflow
         unchecked {
             uint256 prev = balanceOf[usr];
