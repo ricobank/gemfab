@@ -261,6 +261,11 @@ describe('gemfab', () => {
           const gas = await gem.estimateGas.burn(ALI, 1);
           await check(gas, 36111, 36111);
         })
+        it('nonzero to nonzero', async () => {
+          await send(gem.mint, ALI, 2);
+          const gas = await gem.estimateGas.burn(ALI, 1);
+          await check(gas, 36111, 36111);
+        })
       })
       describe('no change', () => {
         it('nonzero to nonzero', async () => {
