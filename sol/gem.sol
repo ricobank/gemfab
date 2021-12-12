@@ -101,7 +101,6 @@ contract Gem {
         }
     }
 
-
     function transfer(address dst, uint wad)
       payable external returns (bool)
     {
