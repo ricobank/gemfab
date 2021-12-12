@@ -161,7 +161,8 @@ contract Gem {
         bytes32 digest = keccak256(abi.encodePacked( "\x19\x01", DOMAIN_SEPARATOR,
             keccak256(abi.encode( PERMIT_TYPEHASH, owner, spender, value, nonce, deadline ))));
         address signer = ecrecover(digest, v, r, s);
-        if (signer == address(0) || owner != signer) { revert ErrPermitSignature(); }
+        if (signer == address(0)) { revert ErrPermitSignature(); }
+        if (owner != signer) { revert ErrPermitSignature(); }
         if (block.timestamp > deadline) { revert ErrPermitDeadline(); }
     }
 }
