@@ -91,11 +91,10 @@ contract Gem {
         // only need to check balanceOf[usr] for underflow
         unchecked {
             uint256 prev = balanceOf[usr];
-            uint256 next = prev - wad;
-            balanceOf[usr] = next;
+            balanceOf[usr] = prev - wad;
             totalSupply    -= wad;
             emit Transfer(usr, address(0), wad);
-            if (next > prev) {
+            if (prev < wad) {
                 revert ErrUnderflow();
             }
         }
