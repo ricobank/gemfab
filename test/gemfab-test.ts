@@ -259,23 +259,23 @@ describe('gemfab', () => {
         it('nonzero to zero', async () => {
           await send(gem.mint, ALI, 1);
           const gas = await gem.estimateGas.burn(ALI, 1);
-          await check(gas, 36111, 36111);
+          await check(gas, 36085, 36085);
         })
         it('nonzero to nonzero', async () => {
           await send(gem.mint, ALI, 2);
           const gas = await gem.estimateGas.burn(ALI, 1);
-          await check(gas, 36111, 36111);
+          await check(gas, 36085, 36085);
         })
       })
       describe('no change', () => {
         it('nonzero to nonzero', async () => {
           await send(gem.mint, ALI, 1);
           const gas = await gem.estimateGas.burn(ALI, 0);
-          await check(gas, 30975, 30975);
+          await check(gas, 30949, 30949);
         })
         it('zero to zero', async () => {
           const gas = await gem.estimateGas.burn(ALI, 0);
-          await check(gas, 30975, 30975);
+          await check(gas, 30949, 30949);
         })
       })
     });
