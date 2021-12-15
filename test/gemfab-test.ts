@@ -391,9 +391,11 @@ describe('gemfab', () => {
   });
 
   describe('rely/deny', () => {
-    it('deny permissions', async function () {
+    it('rely/deny permissions', async function () {
       await fail('ErrWard', gem.connect(bob).ward, ALI, false);
       await fail('ErrWard', gem.connect(bob).ward, BOB, false);
+      await fail('ErrWard', gem.connect(bob).ward, ALI, true);
+      await fail('ErrWard', gem.connect(bob).ward, BOB, true);
       want(await gem.wards(ALI)).to.equal(true);
       await send(gem.ward, BOB, false);
       want(await gem.wards(ALI)).to.equal(true);
