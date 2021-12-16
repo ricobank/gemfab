@@ -92,9 +92,9 @@ describe('common-erc20-issues', () => {
       // A15. custom-fallback-bypass-ds-auth
       // A23. fake-burn
       // A24. getToken-anyone
-    // TODO
-      // A20. re-approve
       // C1. centralAccount-transfer-anyone
+    // wontfix
+      // A20. re-approve
     // ------------------------------------------------------------------
 
     describe('A. List of Bugs in Implementation', () => {
@@ -316,7 +316,7 @@ describe('common-erc20-issues', () => {
         await send(gem.approve, BOB, 1);
       })
 
-      // A20. re-approve TODO
+      // A20. re-approve wontfix
       //   approve() allows the spender account using a given number of tokens by updating the value of allowance.
       //   Suppose the spender account is able to control miners' confirming order of transferring, then spender could use
       //   up all allowance before approve comes into effect. After approve() is effective, spender has access to the new
@@ -326,7 +326,7 @@ describe('common-erc20-issues', () => {
       //   It would only cause the spender using more tokens than expected or the approved tokens less than expectation,
       //   not affecting the account balance and sum of tokens.
       //
-      //   Applies to most ERC20 tokens, just don't approve funds to miners.  Is this an issue?
+      //   Applies to most ERC20 tokens, it's app dev/user's problem.  wontfix.
 
       // A21. check-effect-inconsistency (TH)
       //   The condition verification and the variable modification logic is inconsistent, which fails the verification
@@ -488,10 +488,10 @@ describe('common-erc20-issues', () => {
     })
 
     // C. List of Excessive Authorities
-    // C1. centralAccount-transfer-anyone TODO
+    // C1. centralAccount-transfer-anyone N/A
     //   onlycentralAccount could transfer out other account's balances randomly. (CVE-2018-1000203)
     //
-    //   TODO wards can always mint and burn, wards need to be trusted
+    //   wards can mint and burn but not transfer out
   })
   describe('weird-erc20', async () => {
     // TH = tested here
@@ -515,9 +515,9 @@ describe('common-erc20-issues', () => {
       // Pausable Tokens
       // Multiple Token Addresses
       // Code Injection Via Token Name
-    // TODO
-      // Balance Modifications Outside of Transfers (rebasing / airdrops)
       // Tokens with Blocklists
+    // wontfix
+      // Balance Modifications Outside of Transfers (rebasing / airdrops)
     // ------------------------------------------------------------------
 
     // Reentrant calls (NA)
@@ -542,13 +542,13 @@ describe('common-erc20-issues', () => {
     //
     //   Gem has no fees
 
-    // Balance Modifications Outside of Transfers (rebasing / airdrops) (TODO)
+    // Balance Modifications Outside of Transfers (rebasing / airdrops) (wontfix)
     //   Some tokens may make arbitrary balance modifications outside of transfers (e.g. Ampleforth style rebasing
     //   tokens, Compound style airdrops of governance tokens, mintable / burnable tokens).
     //   Some smart contract systems cache token balances (e.g. Balancer, Uniswap-V2), and arbitrary modifications to
     //   underlying balances can mean that the contract is operating with outdated information.
     //
-    //   TODO Gem wards can mint/burn anyone's balances, wards need to be trusted
+    //   Need to make sure gem controller can't burn balances for some kinds of apps
 
     // Upgradable Tokens (NA)
     //   Some tokens (e.g. USDC, USDT) are upgradable, allowing the token owners to make arbitrary modifications to the
@@ -565,7 +565,7 @@ describe('common-erc20-issues', () => {
     //
     //   Gem has no flash mint
 
-    // Tokens with Blocklists (TODO)
+    // Tokens with Blocklists (NA)
     //   Some tokens (e.g. USDC, USDT) have a contract level admin controlled address blocklist. If an address is
     //   blocked, then transfers to and from that address are forbidden.
     //   Malicious or compromised token owners can trap funds in a contract by adding the contract address to the
@@ -573,7 +573,7 @@ describe('common-erc20-issues', () => {
     //   single user of the contract (e.g. a Uniswap LP), or could also be a part of an extortion attempt against users
     //   of the blocked contract.
     //
-    //   TODO blocklists for mint/burn, wards need to be trusted
+    //   Gem has no blocklist
 
     // Pausable Tokens (NA)
     //   Some tokens can be paused by an admin (e.g. BNB, ZIL).
