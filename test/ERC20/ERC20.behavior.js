@@ -70,9 +70,9 @@ function shouldBehaveLikeERC20 (errorPrefix, initialSupply, initialHolder, recip
             });
 
             it('emits a transfer event', async function () {
-              const { logs } = await this.token.transferFrom(tokenOwner, to, amount, { from: spender });
+              const rx = await this.token.transferFrom(tokenOwner, to, amount, { from: spender });
 
-              expectEvent.inLogs(logs, 'Transfer', {
+              expectEvent(rx, 'Transfer', {
                 src: tokenOwner,
                 dst: to,
                 wad: amount,
@@ -195,9 +195,9 @@ function shouldBehaveLikeERC20Transfer (errorPrefix, from, to, balance, transfer
       });
 
       it('emits a transfer event', async function () {
-        const { logs } = await transfer.call(this, from, to, amount);
+        const rx = await transfer.call(this, from, to, amount);
 
-        expectEvent.inLogs(logs, 'Transfer', {
+        expectEvent(rx, 'Transfer', {
           src: from,
           dst: to,
           wad: amount,
@@ -217,9 +217,9 @@ function shouldBehaveLikeERC20Transfer (errorPrefix, from, to, balance, transfer
       });
 
       it('emits a transfer event', async function () {
-        const { logs } = await transfer.call(this, from, to, amount);
+        const rx = await transfer.call(this, from, to, amount);
 
-        expectEvent.inLogs(logs, 'Transfer', {
+        expectEvent(rx, 'Transfer', {
           src: from,
           dst: to,
           wad: amount,
@@ -245,9 +245,9 @@ function shouldBehaveLikeERC20Approve (errorPrefix, owner, spender, supply, appr
       const amount = supply;
 
       it('emits an approval event', async function () {
-        const { logs } = await approve.call(this, owner, spender, amount);
+        const rx = await approve.call(this, owner, spender, amount);
 
-        expectEvent.inLogs(logs, 'Approval', {
+        expectEvent(rx, 'Approval', {
           src: owner,
           usr: spender,
           wad: amount,
@@ -279,9 +279,9 @@ function shouldBehaveLikeERC20Approve (errorPrefix, owner, spender, supply, appr
       const amount = supply.addn(1);
 
       it('emits an approval event', async function () {
-        const { logs } = await approve.call(this, owner, spender, amount);
+        const rx = await approve.call(this, owner, spender, amount);
 
-        expectEvent.inLogs(logs, 'Approval', {
+        expectEvent(rx, 'Approval', {
           src: owner,
           usr: spender,
           wad: amount,
