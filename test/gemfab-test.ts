@@ -190,7 +190,7 @@ describe('gemfab', () => {
             await send(gem.mint, ALI, 1);
             await send(gem.approve, BOB, allowance);
             const gas = await gem.connect(bob).estimateGas.transferFrom(ALI, BOB, 1);
-            await check(gas, 56907, 56907);
+            await check(gas, 56987, 56987);
           })
           // 01
           it('nonzero to zero ali, nonzero to nonzero bob', async () => {
@@ -198,14 +198,14 @@ describe('gemfab', () => {
             await send(gem.mint, BOB, 1);
             await send(gem.approve, BOB, allowance);
             const gas = await gem.connect(bob).estimateGas.transferFrom(ALI, BOB, 1);
-            await check(gas, 39800, 39800);
+            await check(gas, 39867, 39867);
           })
           // 10
           it('nonzero to nonzero ali, zero to nonzero bob', async () => {
             await send(gem.mint, ALI, 2);
             await send(gem.approve, BOB, allowance);
             const gas = await gem.connect(bob).estimateGas.transferFrom(ALI, BOB, 1);
-            await check(gas, 56984, 56984);
+            await check(gas, 57057, 57057);
           })
           // 11
           it('nonzero to nonzero ali, nonzero to nonzero bob', async () => {
@@ -213,7 +213,7 @@ describe('gemfab', () => {
             await send(gem.mint, BOB, 1);
             await send(gem.approve, BOB, allowance);
             const gas = await gem.connect(bob).estimateGas.transferFrom(ALI, BOB, 1);
-            await check(gas, 39921, 39921);
+            await check(gas, 39997, 39997);
           })
         })
       })
@@ -225,7 +225,7 @@ describe('gemfab', () => {
             await send(gem.mint, ALI, 1);
             await send(gem.approve, BOB, allowance);
             const gas = await gem.connect(bob).estimateGas.transferFrom(ALI, BOB, 1);
-            await check(gas, 53991, 53991);
+            await check(gas, 54065, 54065);
           })
           // 01
           it('nonzero to zero ali, nonzero to nonzero bob', async () => {
@@ -233,14 +233,14 @@ describe('gemfab', () => {
             await send(gem.mint, BOB, 1);
             await send(gem.approve, BOB, allowance);
             const gas = await gem.connect(bob).estimateGas.transferFrom(ALI, BOB, 1);
-            await check(gas, 36900, 36900);
+            await check(gas, 36977, 36977);
           })
           // 10
           it('nonzero to nonzero ali, zero to nonzero bob', async () => {
             await send(gem.mint, ALI, 2);
             await send(gem.approve, BOB, allowance);
             const gas = await gem.connect(bob).estimateGas.transferFrom(ALI, BOB, 1);
-            await check(gas, 53814, 53814);
+            await check(gas, 53881, 53881);
           })
           // 11
           it('nonzero to nonzero ali, nonzero to nonzero bob', async () => {
@@ -248,7 +248,7 @@ describe('gemfab', () => {
             await send(gem.mint, BOB, 1);
             await send(gem.approve, BOB, allowance);
             const gas = await gem.connect(bob).estimateGas.transferFrom(ALI, BOB, 1);
-            await check(gas, 36714, 36714);
+            await check(gas, 36781, 36781);
           })
         })
       })
@@ -335,32 +335,32 @@ describe('gemfab', () => {
         it('zero to nonzero', async () => {
           value.value = 1;
           const gas   = await doPermit();
-          await check(gas, 73947, 73971); // ? variable sig size?
+          await check(gas, 76074, 76086); // ? variable sig size?
         });
         it('nonzero to zero', async () => {
           await send(gem.approve, BOB, 1)
           value.value = 0;
           const gas   = await doPermit();
-          await check(gas, 56913, 56939); // ? variable sig size?
+          await check(gas, 59240, 59252); // ? variable sig size?
         });
         it('nonzero to nonzero', async () => {
           await send(gem.approve, BOB, 1)
           value.value = 2;
           const gas   = await doPermit();
-          await check(gas, 56859, 56871); // ? variable sig size?
+          await check(gas, 58974, 58986); // ? variable sig size?
         });
       })
       describe('no change', () => {
         it('zero to zero', async () => {
           value.value = 0;
           const gas   = await doPermit();
-          await check(gas, 54035, 54059); // ? variable sig size?
+          await check(gas, 56160, 56174); // ? variable sig size?
         });
         it('nonzero to nonzero', async () => {
           await send(gem.approve, BOB, 1);
           value.value = 1;
           const gas   = await doPermit();
-          await check(gas, 54047, 54071); // ? variable sig size?
+          await check(gas, 56174, 56186); // ? variable sig size?
         });
       })
     })
@@ -469,7 +469,7 @@ describe('gemfab', () => {
       sig       = ethers.utils.splitSignature(signature)
       await send(gem.connect(bob).permit, ALI, BOB, amt, deadline, sig.v, sig.r, sig.s);
     });
-    
+
   });
 
 })
