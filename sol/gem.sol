@@ -29,7 +29,7 @@ contract Gem {
     mapping (address => uint)                      public nonces;
     mapping (address => bool)                      public wards;
 
-    bytes32 immutable PERMIT_TYPEHASH = keccak256(
+    bytes32 public PERMIT_TYPEHASH = keccak256(
         'Permit(address owner,address spender,uint256 value,uint256 nonce,uint256 deadline)'
     );
     bytes32 immutable DOMAIN_SEPARATOR = keccak256(abi.encode(
@@ -43,7 +43,7 @@ contract Gem {
     event Approval(address indexed src, address indexed usr, uint wad);
     event Transfer(address indexed src, address indexed dst, uint wad);
     event Ward(address indexed setter, address indexed user, bool authed);
- 
+
     error ErrPermitDeadline();
     error ErrPermitSignature();
     error ErrOverflow();
