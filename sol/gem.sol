@@ -32,18 +32,12 @@ contract Gem {
     bytes32 immutable PERMIT_TYPEHASH = keccak256(
         'Permit(address owner,address spender,uint256 value,uint256 nonce,uint256 deadline)'
     );
-    bytes32 immutable DOMAIN_SEPARATOR = keccak256(abi.encode(
-        keccak256("EIP712Domain(string name,string version,uint256 chainId,address verifyingContract)"),
-        keccak256("GemPermit"),
-        keccak256(bytes("0")),
-        block.chainid,
-        address(this)
-    ));
+    bytes32 immutable DOMAIN_SEPARATOR;
 
     event Approval(address indexed src, address indexed usr, uint wad);
     event Transfer(address indexed src, address indexed dst, uint wad);
     event Ward(address indexed setter, address indexed user, bool authed);
- 
+
     error ErrPermitDeadline();
     error ErrPermitSignature();
     error ErrOverflow();
@@ -55,7 +49,13 @@ contract Gem {
     {
         name = name_;
         symbol = symbol_;
-
+        DOMAIN_SEPARATOR = keccak256(abi.encode(
+            keccak256("EIP712Domain(string name,string version,uint256 chainId,address verifyingContract)"),
+            keccak256(bytes(name)),
+            keccak256(bytes("0")),
+            block.chainid,
+            address(this)
+        ));
         wards[msg.sender] = true;
         emit Ward(msg.sender, msg.sender, true);
     }

@@ -18,7 +18,7 @@ const types = {
 };
 
 const domain = {
-    name: 'GemPermit',
+    name: 'Mock Cash',
     version: '0',
     chainId: undefined,
     verifyingContract: undefined
@@ -469,7 +469,7 @@ describe('gemfab', () => {
       sig       = ethers.utils.splitSignature(signature)
       await send(gem.connect(bob).permit, ALI, BOB, amt, deadline, sig.v, sig.r, sig.s);
     });
-    
+
   });
 
 })
