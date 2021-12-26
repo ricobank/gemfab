@@ -93,9 +93,9 @@ contract('ERC20', function (accounts) {
           });
 
           it('emits an approval event', async function () {
-            const { logs } = await decreaseAllowance(this.token, initialHolder, spender, approvedAmount);
+            const rx = await decreaseAllowance(this.token, initialHolder, spender, approvedAmount);
 
-            expectEvent.inLogs(logs, 'Approval', {
+            expectEvent(rx, 'Approval', {
               src: initialHolder,
               usr: spender,
               wad: new BN(0),
@@ -159,9 +159,9 @@ contract('ERC20', function (accounts) {
 
       describe('when the sender has enough balance', function () {
         it('emits an approval event', async function () {
-          const { logs } = await increaseAllowance(this.token, initialHolder, spender, amount);
+          const rx = await increaseAllowance(this.token, initialHolder, spender, amount);
 
-          expectEvent.inLogs(logs, 'Approval', {
+          expectEvent(rx, 'Approval', {
             src: initialHolder,
             usr: spender,
             wad: amount,
@@ -193,9 +193,9 @@ contract('ERC20', function (accounts) {
         const amount = initialSupply.addn(1);
 
         it('emits an approval event', async function () {
-          const { logs } = await increaseAllowance(this.token, initialHolder, spender, amount);
+          const rx = await increaseAllowance(this.token, initialHolder, spender, amount);
 
-          expectEvent.inLogs(logs, 'Approval', {
+          expectEvent(rx, 'Approval', {
             src: initialHolder,
             usr: spender,
             wad: amount,
@@ -249,8 +249,8 @@ contract('ERC20', function (accounts) {
 
     describe('for a non zero account', function () {
       beforeEach('minting', async function () {
-        const { logs } = await this.token.mint(recipient, amount);
-        this.logs = logs;
+        const rx = await this.token.mint(recipient, amount);
+        this.rx = rx;
       });
 
       it('increments totalSupply', async function () {
@@ -263,7 +263,7 @@ contract('ERC20', function (accounts) {
       });
 
       it('emits Transfer event', async function () {
-        const event = expectEvent.inLogs(this.logs, 'Transfer', {
+        const event = expectEvent(this.rx, 'Transfer', {
           src: ZERO_ADDRESS,
           dst: recipient,
         });
@@ -291,8 +291,8 @@ contract('ERC20', function (accounts) {
       const describeBurn = function (description, amount) {
         describe(description, function () {
           beforeEach('burning', async function () {
-            const { logs } = await this.token.burn(initialHolder, amount, {from: initialHolder});
-            this.logs = logs;
+            const rx = await this.token.burn(initialHolder, amount, {from: initialHolder});
+            this.rx = rx;
           });
 
           it('decrements totalSupply', async function () {
@@ -306,7 +306,7 @@ contract('ERC20', function (accounts) {
           });
 
           it('emits Transfer event', async function () {
-            const event = expectEvent.inLogs(this.logs, 'Transfer', {
+            const event = expectEvent(this.rx, 'Transfer', {
               src: initialHolder,
               dst: ZERO_ADDRESS,
             });
