@@ -1,5 +1,5 @@
 const debug = require('debug')('gemfab:task')
-
+const ethers = require('ethers')
 const { task } = require('hardhat/config')
 
 task('deploy-gemfab', 'deploy GemFab')
