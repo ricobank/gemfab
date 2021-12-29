@@ -6,11 +6,11 @@
   "scripts": {
     "init": "git submodule update --init --recursive",
     "build": "npm run build:sol && npm run build:ts",
-    "build:ts": "tsc",
-    "build:sol": "hh compile",
+    "build:ts": "npx tsc -b",
+    "build:sol": "npx hardhat compile",
     "pretest": "npm run build",
-    "test": "hh test",
-    "fmt": "ts-standard --fix task test index.ts"
+    "test": "npx hardhat test",
+    "fmt": "npx ts-standard --fix task test index.ts"
   },
   "devDependencies": {
     "@nomiclabs/hardhat-ethers": "^2.0.2",
