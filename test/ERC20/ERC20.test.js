@@ -262,6 +262,16 @@ contract('ERC20', function (accounts) {
         expect(await this.token.balanceOf(recipient)).to.be.bignumber.equal(amount);
       });
 
+      it('emits Mint event', async function () {
+        const event = expectEvent(this.rx, 'Mint', {
+          caller: initialHolder,
+          user: recipient,
+        });
+
+        expect(event.args.wad).to.be.bignumber.equal(amount);
+      });
+
+/*
       it('emits Transfer event', async function () {
         const event = expectEvent(this.rx, 'Transfer', {
           src: ZERO_ADDRESS,
@@ -270,6 +280,7 @@ contract('ERC20', function (accounts) {
 
         expect(event.args.wad).to.be.bignumber.equal(amount);
       });
+*/
     });
   });
 
@@ -305,6 +316,15 @@ contract('ERC20', function (accounts) {
             expect(await this.token.balanceOf(initialHolder)).to.be.bignumber.equal(expectedBalance);
           });
 
+          it('emits Burn event', async function () {
+            const event = expectEvent(this.rx, 'Burn', {
+              caller: initialHolder,
+              user: initialHolder
+            });
+
+            expect(event.args.wad).to.be.bignumber.equal(amount);
+          });
+/*
           it('emits Transfer event', async function () {
             const event = expectEvent(this.rx, 'Transfer', {
               src: initialHolder,
@@ -313,6 +333,7 @@ contract('ERC20', function (accounts) {
 
             expect(event.args.wad).to.be.bignumber.equal(amount);
           });
+*/
         });
       };
 
