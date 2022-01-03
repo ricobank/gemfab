@@ -102,7 +102,6 @@ contract Gem {
         }
     }
 
-
     function transfer(address dst, uint wad)
       payable external returns (bool)
     {
@@ -122,18 +121,18 @@ contract Gem {
       payable external returns (bool)
     {
         unchecked {
-            uint256 prev = allowance[src][msg.sender];
-            if ( prev != type(uint256).max ) {
-                allowance[src][msg.sender] = prev - wad;
-                if( prev < wad ) {
+            uint256 prevA = allowance[src][msg.sender];
+            if ( prevA != type(uint256).max ) {
+                allowance[src][msg.sender] = prevA - wad;
+                if( prevA < wad ) {
                     revert ErrUnderflow();
                 }
             }
-            prev = balanceOf[src];
-            balanceOf[src]  = prev - wad;
+            uint256 prevB = balanceOf[src];
+            balanceOf[src]  = prevB - wad;
             balanceOf[dst] += wad;
             emit Transfer(src, dst, wad);
-            if( prev < wad ) {
+            if( prevB < wad ) {
                 revert ErrUnderflow();
             }
             return true;
