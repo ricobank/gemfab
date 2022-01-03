@@ -99,26 +99,26 @@ describe('gemfab', () => {
       describe('change', () => {
         it('zero to nonzero', async () => {
           const gas = await gem.estimateGas.mint(ALI, 1);
-          await check(gas, 70270, 70270);
+          await check(gas, 70293, 70293);
         })
 
         it('nonzero to nonzero', async () => {
           await send(gem.mint, ALI, 1);
           const gas = await gem.estimateGas.mint(ALI, 1);
-          await check(gas, 36070, 36070);
+          await check(gas, 36093, 36093);
         });
       })
 
       describe('no change', () => {
         it('no change zero', async () => {
           const gas = await gem.estimateGas.mint(ALI, 0);
-          await check(gas, 30933, 30933);
+          await check(gas, 30957, 30957);
         })
 
         it('no change nonzero', async () => {
           await send(gem.mint, ALI, 1);
           const gas = await gem.estimateGas.mint(ALI, 0);
-          await check(gas, 30933, 30933);
+          await check(gas, 30957, 30957);
         })
       })
     });
@@ -259,23 +259,23 @@ describe('gemfab', () => {
         it('nonzero to zero', async () => {
           await send(gem.mint, ALI, 1);
           const gas = await gem.estimateGas.burn(ALI, 1);
-          await check(gas, 36085, 36085);
+          await check(gas, 36093, 36093);
         })
         it('nonzero to nonzero', async () => {
           await send(gem.mint, ALI, 2);
           const gas = await gem.estimateGas.burn(ALI, 1);
-          await check(gas, 36085, 36085);
+          await check(gas, 36093, 36093);
         })
       })
       describe('no change', () => {
         it('nonzero to nonzero', async () => {
           await send(gem.mint, ALI, 1);
           const gas = await gem.estimateGas.burn(ALI, 0);
-          await check(gas, 30949, 30949);
+          await check(gas, 30957, 30957);
         })
         it('zero to zero', async () => {
           const gas = await gem.estimateGas.burn(ALI, 0);
-          await check(gas, 30949, 30949);
+          await check(gas, 30957, 30957);
         })
       })
     });
