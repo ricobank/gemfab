@@ -13,9 +13,9 @@ task('deploy-gemfab', 'deploy GemFab')
 
     debug(`Deploying contracts using ${deployer} to ${network.name}`)
 
-    const GemArtifact = await hre.artifacts.readArtifact('Gem')
-    const GemFabArtifact = await hre.artifacts.readArtifact('GemFab')
-    const GemFabDeployer = await hre.ethers.getContractFactory('GemFab')
+    const GemArtifact = require('../artifacts/sol/gem.sol/Gem.json')
+    const GemFabArtifact = require('../artifacts/sol/gem.sol/GemFab.json')
+    const GemFabDeployer = ethers.ContractFactory.fromSolidity(GemFabArtifact, acct)
     const gf = await GemFabDeployer.deploy()
     await gf.deployed()
     debug('GemFab deployed to : ', gf.address)
@@ -36,8 +36,8 @@ task('deploy-gemfab', 'deploy GemFab')
       address: gf.address
     })
 
-    const json = await pb.build()
+    const pack = await pb.build()
 
-    console.log(JSON.stringify(json, null, 2))
-    return json
+    console.log(JSON.stringify(pack, null, 2))
+    return pack
   })
