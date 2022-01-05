@@ -5,6 +5,8 @@ const dpack = require('dpack')
 const { task } = require('hardhat/config')
 
 task('deploy-gemfab', 'deploy GemFab')
+  .addFlag('stdout', 'print the dpack to stdout')
+  .addOptionalParam('outfile', 'save the dpack to this path')
   .setAction(async (args, hre) => {
     const { ethers, network } = hre
 
@@ -21,23 +23,24 @@ task('deploy-gemfab', 'deploy GemFab')
     debug('GemFab deployed to : ', gf.address)
 
     const pb = new dpack.PackBuilder(network.name)
-    await pb.packType({
-      typename: 'Gem',
-      artifact: GemArtifact
-    })
-    await pb.packType({
-      typename: 'GemFab',
-      artifact: GemFabArtifact
-    })
     await pb.packObject({
       objectname: 'gemfab',
       typename: 'GemFab',
       artifact: GemFabArtifact,
       address: gf.address
+    }, true) // alsoPackType
+    await pb.packType({
+      typename: 'Gem',
+      artifact: GemArtifact
     })
 
     const pack = await pb.build()
-
-    console.log(JSON.stringify(pack, null, 2))
+    const str = JSON.stringify(pack, null, 2)
+    if (args.stdout) {
+        console.log(str)
+    }
+    if (args.outfile) {
+        require('fs').writeFileSync(args.outfile, str)
+    }
     return pack
   })
