@@ -23,7 +23,7 @@ function expectEvent (receipt, eventName, eventArgs = {}) {
         }
     })
 
-    expect(found).to.equal(true, `No '${eventName}' events found with args '${eventArgs}`);
+    expect(found).to.equal(true, `No '${eventName}' events found with args ${args}`);
 }
 
 module.exports = { expectEvent }
