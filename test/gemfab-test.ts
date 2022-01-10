@@ -43,7 +43,7 @@ describe('gemfab', () => {
 
     await snapshot(hh)
 
-    chainId = await hh.web3.eth.getChainId();
+    chainId = await hh.network.config.chainId;
 
     domain.chainId           = chainId;
     domain.verifyingContract = gem.address;
@@ -469,7 +469,7 @@ describe('gemfab', () => {
       sig       = ethers.utils.splitSignature(signature)
       await send(gem.connect(bob).permit, ALI, BOB, amt, deadline, sig.v, sig.r, sig.s);
     });
-    
+
   });
 
 })

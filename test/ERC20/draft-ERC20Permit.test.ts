@@ -6,16 +6,20 @@
 // https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/LICENSE
 
 /* eslint-disable */
+import {ethers} from "hardhat";
+import * as hh from "hardhat";
+import {snapshot, revert, send} from 'minihat'
 
-const { BN, constants, expectEvent, expectRevert, time } = require('@openzeppelin/test-helpers');
 const { expect } = require('chai');
-const { MAX_UINT256, ZERO_ADDRESS, ZERO_BYTES32 } = constants;
+const expectRevert = async (f, msg) => { await expect(f).rejectedWith(msg) }
+const { BN } = require('bn.js')
+const { constants, BigNumber } = ethers
 
 const { fromRpcSig } = require('ethereumjs-util');
 const ethSigUtil = require('eth-sig-util');
 const Wallet = require('ethereumjs-wallet').default;
 
-const ERC20PermitMock = artifacts.require('Gem');
+//const ERC20PermitMock = artifacts.require('Gem');
 
 const { EIP712Domain, domainSeparator } = require('./eip712');
 
@@ -29,17 +33,44 @@ const Permit = [
 
 const hre = require('hardhat');
 
-contract('ERC20Permit', function (accounts) {
-  const [ initialHolder, spender, recipient, other ] = accounts;
+describe('ERC20Permit', () => {
+  let initialHolder, spender, recipient, other;
+
 
   const name = 'GemPermit';
   const symbol = 'GEM';
   const version = '0';
 
-  const initialSupply = new BN(100);
+  const initialSupply = BigNumber.from(100);
+
+  let chainId;
+  let gem;
+  let gem_type
+  let gemfab;
+  let gemfab_type
+
+  before(async () => {
+    const [ali, bob, cat, dan] = await ethers.getSigners();
+    [initialHolder, spender, recipient, other] = [ali, bob, cat, dan].map(signer => signer.address)
+    gem_type = await ethers.getContractFactory('Gem', ali)
+    gemfab_type = await ethers.getContractFactory('GemFab', ali)
+
+    gemfab = await gemfab_type.deploy()
+    const gemaddr = await gemfab.callStatic.build(name, symbol)
+    await send(gemfab.build, name, symbol)
+    gem = gem_type.attach(gemaddr)
+
+    await snapshot(hh)
+
+    chainId = await hh.network.config.chainId;
+    //domain.chainId = chainId;
+    //domain.verifyingContract = gem.address;
+  })
+
 
   beforeEach(async function () {
-    this.token = await ERC20PermitMock.new(name, symbol);
+    await revert(hh)
+    this.token = gem;
 
     // We get the chain id from the contract because Ganache (used for coverage) does not return the same chain id
     // from within the EVM as from the JSON RPC interface.
@@ -47,11 +78,11 @@ contract('ERC20Permit', function (accounts) {
 
     //this.chainId = await this.token.getChainId();
     //Gem doesn't have getChainId...hh env has same chainid
-    this.chainId = await hre.web3.eth.getChainId();
+    this.chainId = await hh.network.config.chainId;
   });
 
   it('initial nonce is 0', async function () {
-    expect(await this.token.nonces(initialHolder)).to.be.bignumber.equal('0');
+    expect(await this.token.nonces(initialHolder)).to.eql(constants.Zero);
   });
 
   /*
@@ -70,9 +101,12 @@ contract('ERC20Permit', function (accounts) {
     const owner = wallet.getAddressString();
     const value = new BN(42);
     const nonce = 0;
-    const maxDeadline = MAX_UINT256;
-
-    const buildData = (chainId, verifyingContract, deadline = maxDeadline) => ({
+    //const maxDeadline = Math.floor(Date.now() / 1000) * 2;
+    const maxDeadlineBN = new BN('2').pow(new BN('256')).sub(new BN('1'))
+    const maxDeadline   = BigNumber.from(2)
+      .pow(BigNumber.from(256))
+      .sub(BigNumber.from(1))
+    const buildData = (chainId, verifyingContract, deadline : any = maxDeadlineBN) => ({
       primaryType: 'Permit',
       types: { EIP712Domain, Permit },
       domain: { name, version, chainId, verifyingContract },
@@ -84,10 +118,10 @@ contract('ERC20Permit', function (accounts) {
       const signature = ethSigUtil.signTypedMessage(wallet.getPrivateKey(), { data });
       const { v, r, s } = fromRpcSig(signature);
 
-      const receipt = await this.token.permit(owner, spender, value, maxDeadline, v, r, s);
+      const receipt = await this.token.permit(owner, spender, value.toNumber(), maxDeadline, v, r, s);
 
-      expect(await this.token.nonces(owner)).to.be.bignumber.equal('1');
-      expect(await this.token.allowance(owner, spender)).to.be.bignumber.equal(value);
+      expect(await this.token.nonces(owner)).to.eql(ethers.constants.One);
+      expect(await this.token.allowance(owner, spender)).to.eql(BigNumber.from(value.toNumber()));
     });
 
     it('rejects reused signature', async function () {
@@ -95,10 +129,10 @@ contract('ERC20Permit', function (accounts) {
       const signature = ethSigUtil.signTypedMessage(wallet.getPrivateKey(), { data });
       const { v, r, s } = fromRpcSig(signature);
 
-      await this.token.permit(owner, spender, value, maxDeadline, v, r, s);
+      await this.token.permit(owner, spender, value.toNumber(), maxDeadline, v, r, s);
 
       await expectRevert(
-        this.token.permit(owner, spender, value, maxDeadline, v, r, s),
+        this.token.permit(owner, spender, value.toNumber(), maxDeadline, v, r, s),
         'ErrPermitSignature',
       );
     });
@@ -110,20 +144,20 @@ contract('ERC20Permit', function (accounts) {
       const { v, r, s } = fromRpcSig(signature);
 
       await expectRevert(
-        this.token.permit(owner, spender, value, maxDeadline, v, r, s),
+        this.token.permit(owner, spender, value.toNumber(), maxDeadline, v, r, s),
         'ErrPermitSignature',
       );
     });
 
     it('rejects expired permit', async function () {
-      const deadline = (await time.latest()) - time.duration.weeks(1);
+      const deadline = Math.floor(Date.now() / 1000) - 10;
 
       const data = buildData(this.chainId, this.token.address, deadline);
       const signature = ethSigUtil.signTypedMessage(wallet.getPrivateKey(), { data });
       const { v, r, s } = fromRpcSig(signature);
 
       await expectRevert(
-        this.token.permit(owner, spender, value, deadline, v, r, s),
+        this.token.permit(owner, spender, value.toNumber(), deadline, v, r, s),
         'ErrPermitDeadline',
       );
     });
