@@ -244,7 +244,7 @@ function shouldBehaveLikeERC20Transfer (errorPrefix, _from, _to, balance, transf
           expect(await this.token.balanceOf(to.address)).to.eql(constants.Zero);
         });
 
-        it('emits a transfer event (blob)', async function () {
+        it('emits a transfer event', async function () {
           const tx = await transfer.call(this, from, to, amount);
           const rx = await tx.wait()
 

@@ -361,7 +361,7 @@ describe('ERC20', () => {
             expect(await this.token.balanceOf(initialHolder.address)).to.be.eql(expectedBalance);
           });
 
-          it('emits Burn event (glob)', async function () {
+          it('emits Burn event', async function () {
             const event = expectEvent(this.rx, 'Burn', {
               caller: initialHolder.address,
               user: initialHolder.address,
