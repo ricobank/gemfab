@@ -11,7 +11,7 @@ const { expectEvent } = require('./helpers')
 import {BigNumber, constants} from 'ethers'
 
 function shouldBehaveLikeERC20 (errorPrefix, initialSupply, _initialHolder, _recipient, _anotherAccount) {
-  describe('ERC20 behaviour', function () {
+  {
     let initialHolder, recipient, anotherAccount
     beforeEach(async function () {
       initialHolder  = await _initialHolder
@@ -189,11 +189,11 @@ function shouldBehaveLikeERC20 (errorPrefix, initialSupply, _initialHolder, _rec
           },
       );
     });
-  })
+  }
 }
 
 function shouldBehaveLikeERC20Transfer (errorPrefix, _from, _to, balance, transfer) {
-  describe('transfer test', function () {
+  {
     let from, to
     beforeEach(async function () {
       from = await _from
@@ -256,7 +256,7 @@ function shouldBehaveLikeERC20Transfer (errorPrefix, _from, _to, balance, transf
         });
       });
     });
-  })
+  }
 
   /*
   describe('when the recipient is the zero address', function () {
@@ -270,7 +270,7 @@ function shouldBehaveLikeERC20Transfer (errorPrefix, _from, _to, balance, transf
 }
 
 function shouldBehaveLikeERC20Approve (errorPrefix, _owner, _spender, supply, approve) {
-  describe('ERC20 approve', function () {
+  {
     let owner, spender
     beforeEach(async function () {
       owner   = await _owner
@@ -348,7 +348,7 @@ function shouldBehaveLikeERC20Approve (errorPrefix, _owner, _spender, supply, ap
         });
       });
     });
-  })
+  }
 
   /*
   describe('when the spender is the zero address', function () {
