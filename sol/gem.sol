@@ -22,7 +22,7 @@ contract Gem {
     string  public name;
     string  public symbol;
     uint256 public totalSupply;
-    uint8   public immutable decimals = 18;
+    uint8   public constant decimals = 18;
 
     mapping (address => uint)                      public balanceOf;
     mapping (address => mapping (address => uint)) public allowance;

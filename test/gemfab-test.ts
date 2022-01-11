@@ -481,7 +481,9 @@ describe('gemfab', () => {
     const gem2addr = await gemfab.callStatic.build('other', 'OTHER')
     await send(gemfab.build, 'other', 'OTHER')
     const gem2 = gem_type.attach(gem2addr)
-    debug(Object.keys(gem2));
-
+    const gem_code = await ethers.provider.getCode(gem.address);
+    const gem2_code = await ethers.provider.getCode(gem2.address);
+    want(gem_code).not.eq(gem2_code);
   })
+
 })
