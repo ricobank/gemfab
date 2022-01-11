@@ -42,6 +42,7 @@ contract Gem {
 
     event Approval(address indexed src, address indexed usr, uint256 wad);
     event Transfer(address indexed src, address indexed dst, uint256 wad);
+    event Caller(address indexed caller);
     event Mint(address indexed caller, address indexed user, uint256 wad);
     event Burn(address indexed caller, address indexed user, uint256 wad);
     event Ward(address indexed setter, address indexed user, bool authed);
@@ -110,6 +111,7 @@ contract Gem {
             balanceOf[msg.sender] = prev - wad;
             balanceOf[dst]       += wad;
             emit Transfer(msg.sender, dst, wad);
+            emit Caller(msg.sender);
             if( prev < wad ) {
                 revert ErrUnderflow();
             }
@@ -132,6 +134,7 @@ contract Gem {
             balanceOf[src]  = prevB - wad;
             balanceOf[dst] += wad;
             emit Transfer(src, dst, wad);
+            emit Caller(msg.sender);
             if( prevB < wad ) {
                 revert ErrUnderflow();
             }
