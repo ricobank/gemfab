@@ -15,14 +15,6 @@ const expectRevert = async (f, msg) => { await expect(f).rejectedWith(msg) }
 const { BN } = require('bn.js')
 const { constants, BigNumber } = ethers
 
-const { fromRpcSig } = require('ethereumjs-util');
-const ethSigUtil = require('eth-sig-util');
-const Wallet = require('ethereumjs-wallet').default;
-
-//const ERC20PermitMock = artifacts.require('Gem');
-
-const { EIP712Domain, domainSeparator } = require('./eip712');
-
 const Permit = [
   { name: 'owner', type: 'address' },
   { name: 'spender', type: 'address' },
@@ -35,7 +27,6 @@ const hre = require('hardhat');
 
 describe('ERC20Permit', () => {
   let initialHolder, spender, recipient, other;
-
 
   const name = 'GemPermit';
   const symbol = 'GEM';
@@ -50,10 +41,9 @@ describe('ERC20Permit', () => {
   let gemfab_type
 
   before(async () => {
-    const [ali, bob, cat, dan] = await ethers.getSigners();
-    [initialHolder, spender, recipient, other] = [ali, bob, cat, dan].map(signer => signer.address)
-    gem_type = await ethers.getContractFactory('Gem', ali)
-    gemfab_type = await ethers.getContractFactory('GemFab', ali)
+    [initialHolder, spender, recipient, other] = await ethers.getSigners();
+    gem_type = await ethers.getContractFactory('Gem', initialHolder)
+    gemfab_type = await ethers.getContractFactory('GemFab', initialHolder)
 
     gemfab = await gemfab_type.deploy()
     const gemaddr = await gemfab.callStatic.build(name, symbol)
@@ -82,7 +72,7 @@ describe('ERC20Permit', () => {
   });
 
   it('initial nonce is 0', async function () {
-    expect(await this.token.nonces(initialHolder)).to.eql(constants.Zero);
+    expect(await this.token.nonces(initialHolder.address)).to.eql(constants.Zero);
   });
 
   /*
@@ -96,68 +86,78 @@ describe('ERC20Permit', () => {
    */
 
   describe('permit', function () {
-    const wallet = Wallet.generate();
+    const types = {
+      Permit: [
+        { name: 'owner',    type: 'address' },
+        { name: 'spender',  type: 'address' },
+        { name: 'value',    type: 'uint256' },
+        { name: 'nonce',    type: 'uint256' },
+        { name: 'deadline', type: 'uint256' }
+      ]
+    };
 
-    const owner = wallet.getAddressString();
-    const value = new BN(42);
-    const nonce = 0;
-    //const maxDeadline = Math.floor(Date.now() / 1000) * 2;
-    const maxDeadlineBN = new BN('2').pow(new BN('256')).sub(new BN('1'))
-    const maxDeadline   = BigNumber.from(2)
-      .pow(BigNumber.from(256))
-      .sub(BigNumber.from(1))
-    const buildData = (chainId, verifyingContract, deadline : any = maxDeadlineBN) => ({
-      primaryType: 'Permit',
-      types: { EIP712Domain, Permit },
-      domain: { name, version, chainId, verifyingContract },
-      message: { owner, spender, value, nonce, deadline },
-    });
+    const domain = {
+      name: 'GemPermit',
+      version: '0',
+      chainId: undefined,
+      verifyingContract: undefined
+    };
+
+    const nonce    = 0;
+    const deadline = constants.MaxUint256;
+    let value;
+    before(async () => {
+      value = {
+        owner: initialHolder.address,
+        spender: spender.address,
+        value: 42,
+        nonce: nonce,
+        deadline: deadline
+      };
+      domain.chainId = chainId;
+      domain.verifyingContract = gem.address;
+    })
 
     it('accepts owner signature', async function () {
-      const data = buildData(this.chainId, this.token.address);
-      const signature = ethSigUtil.signTypedMessage(wallet.getPrivateKey(), { data });
-      const { v, r, s } = fromRpcSig(signature);
+      const signature = await initialHolder._signTypedData(domain, types, value)
+      const { v, r, s } = ethers.utils.splitSignature(signature);
 
-      const receipt = await this.token.permit(owner, spender, value.toNumber(), maxDeadline, v, r, s);
+      const receipt = await this.token.permit(initialHolder.address, spender.address, value.value, value.deadline, v, r, s);
 
-      expect(await this.token.nonces(owner)).to.eql(ethers.constants.One);
-      expect(await this.token.allowance(owner, spender)).to.eql(BigNumber.from(value.toNumber()));
+      expect(await this.token.nonces(initialHolder.address)).to.eql(ethers.constants.One);
+      expect(await this.token.allowance(initialHolder.address, spender.address)).to.eql(BigNumber.from(value.value));
     });
 
     it('rejects reused signature', async function () {
-      const data = buildData(this.chainId, this.token.address);
-      const signature = ethSigUtil.signTypedMessage(wallet.getPrivateKey(), { data });
-      const { v, r, s } = fromRpcSig(signature);
+      const signature = await initialHolder._signTypedData(domain, types, value)
+      const { v, r, s } = ethers.utils.splitSignature(signature);
 
-      await this.token.permit(owner, spender, value.toNumber(), maxDeadline, v, r, s);
+      await this.token.permit(initialHolder.address, spender.address, value.value, value.deadline, v, r, s);
 
       await expectRevert(
-        this.token.permit(owner, spender, value.toNumber(), maxDeadline, v, r, s),
+        this.token.permit(initialHolder.address, spender.address, value.value, value.deadline, v, r, s),
         'ErrPermitSignature',
       );
     });
 
     it('rejects other signature', async function () {
-      const otherWallet = Wallet.generate();
-      const data = buildData(this.chainId, this.token.address);
-      const signature = ethSigUtil.signTypedMessage(otherWallet.getPrivateKey(), { data });
-      const { v, r, s } = fromRpcSig(signature);
+      const signature = await other._signTypedData(domain, types, value)
+      const { v, r, s } = ethers.utils.splitSignature(signature);
 
       await expectRevert(
-        this.token.permit(owner, spender, value.toNumber(), maxDeadline, v, r, s),
+        this.token.permit(initialHolder.address, spender.address, value.value, value.deadline, v, r, s),
         'ErrPermitSignature',
       );
     });
 
     it('rejects expired permit', async function () {
-      const deadline = Math.floor(Date.now() / 1000) - 10;
+      value.deadline = Math.floor(Date.now() / 1000) - 10;
 
-      const data = buildData(this.chainId, this.token.address, deadline);
-      const signature = ethSigUtil.signTypedMessage(wallet.getPrivateKey(), { data });
-      const { v, r, s } = fromRpcSig(signature);
+      const signature = await initialHolder._signTypedData(domain, types, value)
+      const { v, r, s } = ethers.utils.splitSignature(signature);
 
       await expectRevert(
-        this.token.permit(owner, spender, value.toNumber(), deadline, v, r, s),
+        this.token.permit(initialHolder.address, spender.address, value.value, value.deadline, v, r, s),
         'ErrPermitDeadline',
       );
     });
