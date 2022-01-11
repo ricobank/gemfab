@@ -1,19 +1,21 @@
-`Gem` is an ERC20 implementation. `GemFab` builds `Gem`s.
+`Gem` is an ERC20 token implementation. `GemFab` is a token factory that builds `Gem`s.
 
-"ERC20" is an ABI definition masquerading as a semantic spec. There is no "standard ERC20".
+See `pack/gemfab_<network>.dpack.json` to get the `gemfab` object plus `Gem` and `GemFab` types. See [`dpack`](https://github.com/dapphub/dpack) for docs on how to use these packs.
 
-If you check `gemfab.built(object)`, you know that `object` is a `Gem` -- no further audit needed.
+The idea is to stop deploying tokens directly, and use a factory for all tokens.
 
-`Gem` is *not safe for extension via inheritance*.
-The Solidity expression `contract MyGem is Gem { ... }` is a paradox; no it is not a Gem, because it will have different code, unless you don't add anything!
-An independently deployed `Gem` will also not appear in the factory's record of valid gems, which will complicate verification slightly for no reason.
+This is because "ERC20" is an ABI definition masquerading as a semantic spec. There is no "standard ERC20".
 
-Instead of customizing your gem via inheritance, `Gem` exposes `mint` and `burn`, with multi-root `rely` and `deny` for authentication.
+If you check `gemfab.built(gem)`, you know that `gem` is a `Gem` -- no further audit needed. An independently deployed `Gem` will not appear in the factory's record of valid gems, which will complicate verification for no reason.
+
+`Gem` is *not safe for extension via inheritance*. Instead of customizing your gem via inheritance, you should use the built-in `mint` and `burn`, with multi-owner `ward` for authentication.
+
 Minting and burning from a controller contract which defines the rules for when those can occur is the most 'hygenic' way to implement all forms of tokenomics.
 
-Here are the implementation choices made for `Gem`. These reflect all our best knowledge about real-world token usage.
+Here are some other implementation choices made for `Gem`.
 
-* Infinite allowance via `approve(code, type(uint256).max);` is kept. This avoids a useless store and is a major gas savings that everyone on the network benefits from.
-* `permit` is kept. There are several minor variations in the wild; this one uses the same as in Uniswap V2 LP tokens (notably, not the same one as Dai).
+* Infinite allowance via `approve(code, type(uint256).max);`. This avoids a useless store and is a major gas savings.
+* `permit` -- There are several minor variations in the wild; this one uses EIP-2612 (notably, has a small difference from earlier permit in Dai).
 * Custom error types for all possible error conditions, with a consistent error API.
-* Invariants preserved with controlled mint/burn means `unchecked` blocks can be used to save gas in every function. *This makes `Gem` the most gas-efficient ERC20 with sane semantics.*
+* Invariants preserved with controlled mint/burn means `unchecked` blocks can be used to save gas in every function.
+* Functions are `payable`, saving a little bit of gas. The contract as a whole will still reject ether sent to invalid ABIs, including regular ether "send" (call with no calldata), which covers the most common mistake.
