@@ -95,6 +95,11 @@ describe('gemfab', () => {
       }
     }
 
+    it('decimals', async()=>{ // checking constant vs immutable -- no difference
+      const gas = await gem.estimateGas.decimals();
+      await check(gas, 21313, 21313);
+    });
+
     describe('mint', () => {
       describe('change', () => {
         it('zero to nonzero', async () => {
@@ -472,4 +477,11 @@ describe('gemfab', () => {
 
   });
 
+  it('code changes bc immutable name+symbol', async()=>{
+    const gem2addr = await gemfab.callStatic.build('other', 'OTHER')
+    await send(gemfab.build, 'other', 'OTHER')
+    const gem2 = gem_type.attach(gem2addr)
+    debug(Object.keys(gem2));
+
+  })
 })

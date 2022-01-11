@@ -8,7 +8,7 @@
     "build:ts": "tsc",
     "build:sol": "hardhat compile",
     "pretest": "npm run build",
-    "test": "hardhat test",
+    "test": "ts-mocha test/*",
     "fmt": "ts-standard --fix task test index.ts"
   },
   "devDependencies": {
