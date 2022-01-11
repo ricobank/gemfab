@@ -16,7 +16,6 @@
     "@types/mocha": "^9.0.0",
     "debug": "^4.3.2",
     "dpack": "github:dapphub/dpack",
-    "ethereumjs-wallet": "^1.0.2",
     "ethers": ">=5.4.7 <5.5.0",
     "hardhat": "^2.6.5",
     "minihat": "^0.0.4",
