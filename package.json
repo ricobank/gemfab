@@ -5,7 +5,7 @@
   "scripts": {
     "init": "git submodule update --init --recursive",
     "build": "npm run build:sol && npm run build:ts",
-    "build:ts": "tsc",
+    "build:ts": "npx tsc -b",
     "build:sol": "hardhat compile",
     "pretest": "npm run build",
     "test": "ts-mocha 'test/**'",
