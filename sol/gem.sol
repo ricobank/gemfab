@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: AGPL-3.0-or-later
+/// SPDX-License-Identifier: AGPL-3.0-or-later
 
 // Copyright (C) 2021 kevin and his friends
 // Copyright (C) 2017, 2018, 2019 dbrock, rain, mrchico
@@ -42,7 +42,6 @@ contract Gem {
 
     event Approval(address indexed src, address indexed usr, uint256 wad);
     event Transfer(address indexed src, address indexed dst, uint256 wad);
-    event Caller(address indexed caller);
     event Mint(address indexed caller, address indexed user, uint256 wad);
     event Burn(address indexed caller, address indexed user, uint256 wad);
     event Ward(address indexed setter, address indexed user, bool authed);
@@ -111,7 +110,6 @@ contract Gem {
             balanceOf[msg.sender] = prev - wad;
             balanceOf[dst]       += wad;
             emit Transfer(msg.sender, dst, wad);
-            emit Caller(msg.sender);
             if( prev < wad ) {
                 revert ErrUnderflow();
             }
@@ -133,8 +131,10 @@ contract Gem {
             uint256 prevB = balanceOf[src];
             balanceOf[src]  = prevB - wad;
             balanceOf[dst] += wad;
+	    
             emit Transfer(src, dst, wad);
-            emit Caller(msg.sender);
+            assembly{ log1(caller(), 0, 0) }
+	    
             if( prevB < wad ) {
                 revert ErrUnderflow();
             }
