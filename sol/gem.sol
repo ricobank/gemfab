@@ -131,10 +131,10 @@ contract Gem {
             uint256 prevB = balanceOf[src];
             balanceOf[src]  = prevB - wad;
             balanceOf[dst] += wad;
-	    
+    
             emit Transfer(src, dst, wad);
             assembly{ log1(caller(), 0, 0) }
-	    
+    
             if( prevB < wad ) {
                 revert ErrUnderflow();
             }
