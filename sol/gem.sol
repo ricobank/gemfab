@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: AGPL-3.0-or-later
+/// SPDX-License-Identifier: AGPL-3.0-or-later
 
 // Copyright (C) 2021 kevin and his friends
 // Copyright (C) 2017, 2018, 2019 dbrock, rain, mrchico
@@ -131,7 +131,10 @@ contract Gem {
             uint256 prevB = balanceOf[src];
             balanceOf[src]  = prevB - wad;
             balanceOf[dst] += wad;
+    
             emit Transfer(src, dst, wad);
+            assembly{ log1(caller(), 0, 0) }
+    
             if( prevB < wad ) {
                 revert ErrUnderflow();
             }
