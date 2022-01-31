@@ -29,16 +29,12 @@ contract Gem {
     mapping (address => uint)                      public nonces;
     mapping (address => bool)                      public wards;
 
+    bytes32 immutable DOMAIN_SUBHASH = keccak256(
+        'EIP712Domain(string name,string version,uint256 chainId,address verifyingContract)'
+    );
     bytes32 immutable PERMIT_TYPEHASH = keccak256(
         'Permit(address owner,address spender,uint256 value,uint256 nonce,uint256 deadline)'
     );
-    bytes32 immutable DOMAIN_SEPARATOR = keccak256(abi.encode(
-        keccak256("EIP712Domain(string name,string version,uint256 chainId,address verifyingContract)"),
-        keccak256("GemPermit"),
-        keccak256(bytes("0")),
-        block.chainid,
-        address(this)
-    ));
 
     event Approval(address indexed src, address indexed usr, uint256 wad);
     event Transfer(address indexed src, address indexed dst, uint256 wad);
@@ -160,7 +156,10 @@ contract Gem {
         address signer;
         unchecked {
             signer = ecrecover(
-                keccak256(abi.encodePacked( "\x19\x01", DOMAIN_SEPARATOR,
+                keccak256(abi.encodePacked( "\x19\x01",
+                    keccak256(abi.encode( DOMAIN_SUBHASH,
+                        keccak256("GemPermit"), keccak256(bytes("0")),
+                        block.chainid, address(this))),
                     keccak256(abi.encode( PERMIT_TYPEHASH, owner, spender,
                         value, nonces[owner]++, deadline )))),
                 v, r, s
