@@ -340,32 +340,32 @@ describe('gemfab', () => {
         it('zero to nonzero', async () => {
           value.value = 1;
           const gas   = await doPermit();
-          await check(gas, 73947, 73971); // ? variable sig size?
+          await check(gas, 74264, 74264); // ? variable sig size?
         });
         it('nonzero to zero', async () => {
           await send(gem.approve, BOB, 1)
           value.value = 0;
           const gas   = await doPermit();
-          await check(gas, 56913, 56939); // ? variable sig size?
+          await check(gas, 57260, 57260); // ? variable sig size?
         });
         it('nonzero to nonzero', async () => {
           await send(gem.approve, BOB, 1)
           value.value = 2;
           const gas   = await doPermit();
-          await check(gas, 56859, 56871); // ? variable sig size?
+          await check(gas, 57164, 57164); // ? variable sig size?
         });
       })
       describe('no change', () => {
         it('zero to zero', async () => {
           value.value = 0;
           const gas   = await doPermit();
-          await check(gas, 54035, 54059); // ? variable sig size?
+          await check(gas, 54352, 54352); // ? variable sig size?
         });
         it('nonzero to nonzero', async () => {
           await send(gem.approve, BOB, 1);
           value.value = 1;
           const gas   = await doPermit();
-          await check(gas, 54047, 54071); // ? variable sig size?
+          await check(gas, 54364, 54364); // ? variable sig size?
         });
       })
     })
@@ -477,13 +477,13 @@ describe('gemfab', () => {
 
   });
 
-  it('code changes bc immutable name+symbol', async()=>{
+  it('code doesnt change bc we dont use any immutable (in-code) vars', async()=>{
     const gem2addr = await gemfab.callStatic.build('other', 'OTHER')
     await send(gemfab.build, 'other', 'OTHER')
     const gem2 = gem_type.attach(gem2addr)
     const gem_code = await ethers.provider.getCode(gem.address);
     const gem2_code = await ethers.provider.getCode(gem2.address);
-    want(gem_code).not.eq(gem2_code);
+    want(gem_code).eq(gem2_code);
   })
 
 })
