@@ -158,7 +158,7 @@ contract Gem {
             signer = ecrecover(
                 keccak256(abi.encodePacked( "\x19\x01",
                     keccak256(abi.encode( DOMAIN_SUBHASH,
-                        keccak256("GemPermit"), keccak256(bytes("0")),
+                        keccak256("GemPermit"), keccak256("0"),
                         block.chainid, address(this))),
                     keccak256(abi.encode( PERMIT_TYPEHASH, owner, spender,
                         value, nonces[owner]++, deadline )))),
