@@ -1,6 +1,6 @@
 {
   "name": "gemfab",
-  "version": "0.0.10",
+  "version": "0.0.11",
   "main": "./dist/index.js",
   "scripts": {
     "init": "git submodule update --init --recursive",
@@ -12,10 +12,10 @@
     "fmt": "ts-standard --fix task test index.ts"
   },
   "devDependencies": {
+    "@etherpacks/dpack": "^0.0.24",
     "@nomiclabs/hardhat-ethers": "^2.0.2",
     "@types/mocha": "^9.0.0",
     "debug": "^4.3.2",
-    "dpack": "github:dapphub/dpack",
     "ethers": "^5.5.3",
     "hardhat": "^2.6.5",
     "minihat": "^0.0.4",

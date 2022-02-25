@@ -1,6 +1,6 @@
 const debug = require('debug')('gemfab:task')
 
-const dpack = require('dpack')
+const dpack = require('@etherpacks/dpack')
 
 const { task } = require('hardhat/config')
 
