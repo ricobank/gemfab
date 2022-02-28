@@ -145,11 +145,12 @@ describe('gemfab', () => {
       const clear = (maxAllow) => async (prev, next) => {
         const max = constants.MaxUint256
         // approve is always nonzero->nonzero for now
-        await send(gem.approve, ALI, maxAllow ? max : max.sub(1));
-        return send(gem.transferFrom, ALI, BOB, prev - next)
+        await send(gem.approve, BOB, maxAllow ? max : max.sub(1));
+        // tx with msg.sender == bob to account for tokens that treat allowance(a, a) == inf
+        return send(gem.connect(bob).transferFrom, ALI, BOB, prev - next)
       }
       const stay = async (prev) => {
-        return send(gem.transferFrom, ALI, BOB, 0)
+        return send(gem.connect(bob).transferFrom, ALI, BOB, 0)
       }
       test2D(
         'transferFrom sub-max allowance', NOP, fillDst,
