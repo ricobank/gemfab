@@ -41,7 +41,7 @@ contract Gem {
     event Mint(address indexed caller, address indexed user, uint256 wad);
     event Burn(address indexed caller, address indexed user, uint256 wad);
     event Ward(address indexed setter, address indexed user, bool authed);
- 
+
     error ErrPermitDeadline();
     error ErrPermitSignature();
     error ErrOverflow();
@@ -124,13 +124,13 @@ contract Gem {
                     revert ErrUnderflow();
                 }
             }
+            balanceOf[dst] += wad;
             uint256 prevB = balanceOf[src];
             balanceOf[src]  = prevB - wad;
-            balanceOf[dst] += wad;
-    
+
             emit Transfer(src, dst, wad);
             assembly{ log1(caller(), 0, 0) }
-    
+
             if( prevB < wad ) {
                 revert ErrUnderflow();
             }
