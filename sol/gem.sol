@@ -118,18 +118,19 @@ contract Gem {
     {
         unchecked {
             uint256 prevA = allowance[src][msg.sender];
-            if ( prevA != type(uint256).max ) {
-                allowance[src][msg.sender] = prevA - wad;
-                if( prevA < wad ) {
-                    revert ErrUnderflow();
-                }
-            }
             balanceOf[dst] += wad;
             uint256 prevB = balanceOf[src];
             balanceOf[src]  = prevB - wad;
 
             emit Transfer(src, dst, wad);
             assembly{ log1(caller(), 0, 0) }
+
+            if ( prevA != type(uint256).max ) {
+                allowance[src][msg.sender] = prevA - wad;
+                if( prevA < wad ) {
+                    revert ErrUnderflow();
+                }
+            }
 
             if( prevB < wad ) {
                 revert ErrUnderflow();
