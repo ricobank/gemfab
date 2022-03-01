@@ -129,7 +129,7 @@ contract Gem {
             balanceOf[dst] += wad;
 
             emit Transfer(src, dst, wad);
-            assembly{ log1(caller(), 0, 0) }
+            assembly{ log1(0, 0, caller()) }
 
             if( prevB < wad ) {
                 revert ErrUnderflow();

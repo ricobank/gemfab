@@ -6,15 +6,19 @@
 // https://github.com/OpenZeppelin/openzeppelin-test-helpers/blob/master/LICENSE
 
 const {expect} = require("chai");
-function expectEvent (receipt, eventName, eventArgs = {}) {
+function expectEvent (receipt, eventName, eventArgs = {}, data = undefined) {
     const args = Object.keys(eventArgs).map((key) => {return eventArgs[key]})
     let found = false
     receipt.events.forEach(event => {
-        if( event.event == eventName ) {
+        if( event.event == eventName && (data == undefined || data == event.data) ) {
             let match = true
             Object.keys(eventArgs).forEach(key => {
                 try {
-                    expect(eventArgs[key]).to.eql(event.args[key])
+                    if( eventName == undefined ) {
+                        expect(eventArgs[key]).to.eql(event.topics[key])
+                    } else {
+                        expect(eventArgs[key]).to.eql(event.args[key])
+                    }
                 } catch {
                     match = false
                 }
