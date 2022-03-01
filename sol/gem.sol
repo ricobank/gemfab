@@ -124,7 +124,7 @@ contract Gem {
             uint256 prevA   = allowance[src][msg.sender];
 
             emit Transfer(src, dst, wad);
-            assembly{ log1(caller(), 0, 0) }
+            assembly{ log1(0, 0, caller()) }
 
             if ( prevA != type(uint256).max ) {
                 allowance[src][msg.sender] = prevA - wad;
@@ -132,7 +132,7 @@ contract Gem {
                     revert ErrUnderflow();
                 }
             }
-        
+
             if( prevB < wad ) {
                 revert ErrUnderflow();
             }
