@@ -1,4 +1,4 @@
-// redo expectEvent to work with web3
+// redo expectEvent to work with ethers
 //     https://github.com/OpenZeppelin/openzeppelin-test-helpers/blob/master/src/expectEvent.js
 //
 // The MIT License (MIT)
@@ -6,6 +6,9 @@
 // https://github.com/OpenZeppelin/openzeppelin-test-helpers/blob/master/LICENSE
 
 const {expect} = require("chai");
+
+// matches eventName
+// matches data if defined
 function expectEvent (receipt, eventName, eventArgs = {}, data = undefined) {
     const args = Object.keys(eventArgs).map((key) => {return eventArgs[key]})
     let found = false
