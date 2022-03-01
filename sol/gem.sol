@@ -41,7 +41,7 @@ contract Gem {
     event Mint(address indexed caller, address indexed user, uint256 wad);
     event Burn(address indexed caller, address indexed user, uint256 wad);
     event Ward(address indexed setter, address indexed user, bool authed);
- 
+
     error ErrPermitDeadline();
     error ErrPermitSignature();
     error ErrOverflow();
@@ -99,9 +99,10 @@ contract Gem {
     }
 
     function transfer(address dst, uint wad)
-      payable external returns (bool)
+      payable external returns (bool ok)
     {
         unchecked {
+            ok = true;
             uint256 prev = balanceOf[msg.sender];
             balanceOf[msg.sender] = prev - wad;
             balanceOf[dst]       += wad;
@@ -109,7 +110,6 @@ contract Gem {
             if( prev < wad ) {
                 revert ErrUnderflow();
             }
-            return true;
         }
     }
 
@@ -127,10 +127,10 @@ contract Gem {
             uint256 prevB = balanceOf[src];
             balanceOf[src]  = prevB - wad;
             balanceOf[dst] += wad;
-    
+
             emit Transfer(src, dst, wad);
             assembly{ log1(caller(), 0, 0) }
-    
+
             if( prevB < wad ) {
                 revert ErrUnderflow();
             }
@@ -139,11 +139,11 @@ contract Gem {
     }
 
     function approve(address usr, uint wad)
-      payable external returns (bool)
+      payable external returns (bool ok)
     {
+        ok = true;
         allowance[msg.sender][usr] = wad;
         emit Approval(msg.sender, usr, wad);
-        return true;
     }
 
     // EIP-2612
