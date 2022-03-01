@@ -8,6 +8,8 @@ import { bounds as _bounds } from './bounds'
 const bounds = _bounds.gem
 import { TypedDataUtils } from 'ethers-eip712'
 
+const { expectEvent } = require('./ERC20/helpers')
+
 const debug = require('debug')('gemfab:test')
 
 const types = {
@@ -313,4 +315,10 @@ describe('gemfab', () => {
     want(gem_code).eq(gem2_code);
   })
 
+  it('transferFrom emits anonymous caller event', async () => {
+    await send(gem.mint, ALI, 1)
+    await send(gem.approve, BOB, 1)
+    const rx = await send(gem.connect(bob).transferFrom, ALI, BOB, 1)
+    expectEvent(rx, undefined, [ethers.utils.hexZeroPad(BOB, 32).toLowerCase()], '0x')
+  })
 })
