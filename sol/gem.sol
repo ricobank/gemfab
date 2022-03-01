@@ -114,9 +114,10 @@ contract Gem {
     }
 
     function transferFrom(address src, address dst, uint wad)
-      payable external returns (bool)
+      payable external returns (bool ok)
     {
         unchecked {
+            ok              = true;
             balanceOf[dst] += wad;
             uint256 prevB   = balanceOf[src];
             balanceOf[src]  = prevB - wad;
@@ -135,7 +136,6 @@ contract Gem {
             if( prevB < wad ) {
                 revert ErrUnderflow();
             }
-            return true;
         }
     }
 
