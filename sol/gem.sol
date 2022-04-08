@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: AGPL-3.0-or-later
+/// SPDX-License-Identifier: AGPL-3.0-or-later
 
 // Copyright (C) 2021 kevin and his friends
 // Copyright (C) 2017, 2018, 2019 dbrock, rain, mrchico
@@ -29,21 +29,19 @@ contract Gem {
     mapping (address => uint)                      public nonces;
     mapping (address => bool)                      public wards;
 
+    bytes32 immutable DOMAIN_SUBHASH = keccak256(
+        'EIP712Domain(string name,string version,uint256 chainId,address verifyingContract)'
+    );
     bytes32 immutable PERMIT_TYPEHASH = keccak256(
         'Permit(address owner,address spender,uint256 value,uint256 nonce,uint256 deadline)'
     );
-    bytes32 immutable DOMAIN_SEPARATOR = keccak256(abi.encode(
-        keccak256("EIP712Domain(string name,string version,uint256 chainId,address verifyingContract)"),
-        keccak256("GemPermit"),
-        keccak256(bytes("0")),
-        block.chainid,
-        address(this)
-    ));
 
-    event Approval(address indexed src, address indexed usr, uint wad);
-    event Transfer(address indexed src, address indexed dst, uint wad);
+    event Approval(address indexed src, address indexed usr, uint256 wad);
+    event Transfer(address indexed src, address indexed dst, uint256 wad);
+    event Mint(address indexed caller, address indexed user, uint256 wad);
+    event Burn(address indexed caller, address indexed user, uint256 wad);
     event Ward(address indexed setter, address indexed user, bool authed);
- 
+
     error ErrPermitDeadline();
     error ErrPermitSignature();
     error ErrOverflow();
@@ -80,7 +78,7 @@ contract Gem {
             }
             balanceOf[usr] += wad;
             totalSupply     = prev + wad;
-            emit Transfer(address(0), usr, wad);
+            emit Mint(msg.sender, usr, wad);
         }
     }
 
@@ -93,18 +91,18 @@ contract Gem {
             uint256 prev = balanceOf[usr];
             balanceOf[usr] = prev - wad;
             totalSupply    -= wad;
-            emit Transfer(usr, address(0), wad);
+            emit Burn(msg.sender, usr, wad);
             if (prev < wad) {
                 revert ErrUnderflow();
             }
         }
     }
 
-
     function transfer(address dst, uint wad)
-      payable external returns (bool)
+      payable external returns (bool ok)
     {
         unchecked {
+            ok = true;
             uint256 prev = balanceOf[msg.sender];
             balanceOf[msg.sender] = prev - wad;
             balanceOf[dst]       += wad;
@@ -112,38 +110,41 @@ contract Gem {
             if( prev < wad ) {
                 revert ErrUnderflow();
             }
-            return true;
         }
     }
 
     function transferFrom(address src, address dst, uint wad)
-      payable external returns (bool)
+      payable external returns (bool ok)
     {
         unchecked {
-            uint256 prev = allowance[src][msg.sender];
-            if ( prev != type(uint256).max ) {
-                allowance[src][msg.sender] = prev - wad;
-                if( prev < wad ) {
+            ok              = true;
+            balanceOf[dst] += wad;
+            uint256 prevB   = balanceOf[src];
+            balanceOf[src]  = prevB - wad;
+            uint256 prevA   = allowance[src][msg.sender];
+
+            emit Transfer(src, dst, wad);
+            assembly{ log1(0, 0, caller()) }
+
+            if ( prevA != type(uint256).max ) {
+                allowance[src][msg.sender] = prevA - wad;
+                if( prevA < wad ) {
                     revert ErrUnderflow();
                 }
             }
-            prev = balanceOf[src];
-            balanceOf[src]  = prev - wad;
-            balanceOf[dst] += wad;
-            emit Transfer(src, dst, wad);
-            if( prev < wad ) {
+
+            if( prevB < wad ) {
                 revert ErrUnderflow();
             }
-            return true;
         }
     }
 
     function approve(address usr, uint wad)
-      payable external returns (bool)
+      payable external returns (bool ok)
     {
+        ok = true;
         allowance[msg.sender][usr] = wad;
         emit Approval(msg.sender, usr, wad);
-        return true;
     }
 
     // EIP-2612
@@ -156,7 +157,10 @@ contract Gem {
         address signer;
         unchecked {
             signer = ecrecover(
-                keccak256(abi.encodePacked( "\x19\x01", DOMAIN_SEPARATOR,
+                keccak256(abi.encodePacked( "\x19\x01",
+                    keccak256(abi.encode( DOMAIN_SUBHASH,
+                        keccak256("GemPermit"), keccak256("0"),
+                        block.chainid, address(this))),
                     keccak256(abi.encode( PERMIT_TYPEHASH, owner, spender,
                         value, nonces[owner]++, deadline )))),
                 v, r, s

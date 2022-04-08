@@ -1,9 +1,12 @@
 const debug = require('debug')('gemfab:task')
 
+const dpack = require('@etherpacks/dpack')
+
 const { task } = require('hardhat/config')
 
 task('deploy-gemfab', 'deploy GemFab')
-  .addOptionalParam('outfile', 'output file to save export json')
+  .addFlag('stdout', 'print the dpack to stdout')
+  .addOptionalParam('outfile', 'save the dpack to this path')
   .setAction(async (args, hre) => {
     const { ethers, network } = hre
 
@@ -12,35 +15,32 @@ task('deploy-gemfab', 'deploy GemFab')
 
     debug(`Deploying contracts using ${deployer} to ${network.name}`)
 
-    const GemArtifact = await hre.artifacts.readArtifact('Gem')
-    const GemFabArtifact = await hre.artifacts.readArtifact('GemFab')
-    const GemFabDeployer = await hre.ethers.getContractFactory('GemFab')
+    const GemArtifact = require('../artifacts/sol/gem.sol/Gem.json')
+    const GemFabArtifact = require('../artifacts/sol/gem.sol/GemFab.json')
+    const GemFabDeployer = ethers.ContractFactory.fromSolidity(GemFabArtifact, acct)
     const gf = await GemFabDeployer.deploy()
     await gf.deployed()
     debug('GemFab deployed to : ', gf.address)
 
-    const out = { types: {}, objects: {} }
-    out.types['Gem'] = {
-      typename: 'Gem',
-      artifact: GemArtifact
-    }
-    out.types['GemFab'] = {
-      typename: 'GemFab',
-      artifact: GemFabArtifact
-    }
-    out.objects['gemfab'] = {
-      name: 'gemfab',
+    const pb = new dpack.PackBuilder(network.name)
+    await pb.packObject({
+      objectname: 'gemfab',
       typename: 'GemFab',
       artifact: GemFabArtifact,
       address: gf.address
-    }
-    const json = JSON.stringify(out)
+    }, true) // alsoPackType
+    await pb.packType({
+      typename: 'Gem',
+      artifact: GemArtifact
+    })
 
-    debug('WARN force writing file -- uprade to dpack later')
-    if (args.outfile) {
-      const fs = require('fs')
-      fs.writeFileSync(args.outfile, json)
-    } else {
-      console.log(json)
+    const pack = await pb.build()
+    const str = JSON.stringify(pack, null, 2)
+    if (args.stdout) {
+        console.log(str)
     }
+    if (args.outfile) {
+        require('fs').writeFileSync(args.outfile, str)
+    }
+    return pack
   })

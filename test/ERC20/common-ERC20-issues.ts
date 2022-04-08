@@ -50,7 +50,7 @@ describe('common-erc20-issues', () => {
 
     await snapshot(hh)
 
-    chainId = await hh.web3.eth.getChainId();
+    chainId = await hh.network.config.chainId;
     domain.chainId = chainId;
     domain.verifyingContract = gem.address;
   })
