@@ -3,7 +3,7 @@
   "version": "0.0.11",
   "main": "./dist/index.js",
   "scripts": {
-    "init": "git submodule update --init --recursive",
+    "init": "npm i",
     "build": "npm run build:sol && npm run build:ts",
     "build:ts": "npx tsc -b",
     "build:sol": "hardhat compile",

@@ -1,7 +1,7 @@
 import * as hh from 'hardhat'
 import { ethers, artifacts, network } from 'hardhat'
 import { want, send, fail, snapshot, revert } from 'minihat'
-const { constants, BigNumber } = ethers
+const { constants, BigNumber, utils } = ethers
 
 import { test1D, test2D } from './helpers'
 import { bounds as _bounds } from './bounds'
@@ -42,8 +42,10 @@ describe('gemfab', () => {
     gemfab_type = await ethers.getContractFactory('GemFab', ali)
 
     gemfab = await gemfab_type.deploy()
-    const gemaddr = await gemfab.callStatic.build('Mock Cash', 'CASH')
-    await send(gemfab.build, 'Mock Cash', 'CASH')
+    const name = utils.formatBytes32String('Mock Cash');
+    const symbol = utils.formatBytes32String('CASH');
+    const gemaddr = await gemfab.callStatic.build(name, symbol)
+    await send(gemfab.build, name, symbol)
     gem = gem_type.attach(gemaddr)
 
     await snapshot(hh)
@@ -307,8 +309,10 @@ describe('gemfab', () => {
   });
 
   it('code doesnt change bc we dont use any immutable (in-code) vars', async()=>{
-    const gem2addr = await gemfab.callStatic.build('other', 'OTHER')
-    await send(gemfab.build, 'other', 'OTHER')
+    const name = utils.formatBytes32String('other');
+    const symbol = utils.formatBytes32String('OTHER');
+    const gem2addr = await gemfab.callStatic.build(name, symbol)
+    await send(gemfab.build, name, symbol)
     const gem2 = gem_type.attach(gem2addr)
     const gem_code = await ethers.provider.getCode(gem.address);
     const gem2_code = await ethers.provider.getCode(gem2.address);

@@ -8,12 +8,11 @@
 import {ethers} from "hardhat";
 import * as hh from "hardhat";
 import {snapshot, revert, send} from 'minihat'
-import {Signer, constants} from "ethers";
+import {Signer, constants, utils} from "ethers";
 
 const { expectEvent } = require('./helpers')
 const { expect } = require('chai');
 const expectRevert = async (f, msg) => { await expect(f).rejectedWith(msg) }
-const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000';
 const { BigNumber } = ethers
 
 const {
@@ -43,8 +42,8 @@ let initialHolder, recipient, anotherAccount : Signer;
 
 describe('ERC20', () => {
 
-  const name = 'Gem';
-  const symbol = 'GEM';
+  const name = utils.formatBytes32String('Gem');
+  const symbol = utils.formatBytes32String('GEM');
 
   const initialSupply = BigNumber.from(1000);
 

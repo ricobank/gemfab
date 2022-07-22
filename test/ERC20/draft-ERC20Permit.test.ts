@@ -13,7 +13,7 @@ import {snapshot, revert, send} from 'minihat'
 const { expect } = require('chai');
 const expectRevert = async (f, msg) => { await expect(f).rejectedWith(msg) }
 const { BN } = require('bn.js')
-const { constants, BigNumber } = ethers
+const { constants, BigNumber, utils } = ethers
 
 const Permit = [
   { name: 'owner', type: 'address' },
@@ -28,8 +28,8 @@ const hre = require('hardhat');
 describe('ERC20Permit', () => {
   let initialHolder, spender, recipient, other;
 
-  const name = 'GemPermit';
-  const symbol = 'GEM';
+  const name = utils.formatBytes32String('GemPermit');
+  const symbol = utils.formatBytes32String('GEM');
   const version = '0';
 
   const initialSupply = BigNumber.from(100);
