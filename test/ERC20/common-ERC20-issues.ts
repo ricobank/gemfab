@@ -1,8 +1,8 @@
 
 import * as hh from 'hardhat'
-import { ethers, artifacts, network } from 'hardhat'
+import { ethers } from 'hardhat'
 import { want, send, fail, snapshot, revert } from 'minihat'
-const { constants, BigNumber } = ethers
+const { formatBytes32String } = ethers.utils
 
 const debug = require('debug')('gemfab:test')
 
@@ -44,8 +44,10 @@ describe('common-erc20-issues', () => {
     gemfab_type = await ethers.getContractFactory('GemFab', ali)
 
     gemfab = await gemfab_type.deploy()
-    const gemaddr = await gemfab.callStatic.build('Mock Cash', 'CASH')
-    await send(gemfab.build, 'Mock Cash', 'CASH')
+    const name = formatBytes32String('Mock Cash');
+    const symbol = formatBytes32String('CASH');
+    const gemaddr = await gemfab.callStatic.build(name, symbol)
+    await send(gemfab.build, name, symbol)
     gem = gem_type.attach(gemaddr)
 
     await snapshot(hh)
@@ -262,8 +264,8 @@ describe('common-erc20-issues', () => {
         want(constructor.type).to.equal('constructor')
         want(constructor.payable).to.equal(true)
         want(constructor.inputs.length).to.equal(2)
-        want(constructor.inputs[0].type).to.equal('string')
-        want(constructor.inputs[1].type).to.equal('string')
+        want(constructor.inputs[0].type).to.equal('bytes32')
+        want(constructor.inputs[1].type).to.equal('bytes32')
         want(gem.functions.Gem).to.equal(undefined)
         want(gem.functions.gem).to.equal(undefined)
       })
@@ -639,24 +641,6 @@ describe('common-erc20-issues', () => {
       want((await gem.balanceOf(ALI)).toNumber()).to.equal(0);
       want((await gem.balanceOf(BOB)).toNumber()).to.equal(1);
       want((await gem.allowance(ALI, ALI)).toNumber()).to.equal(0);
-    })
-
-    // Non string metadata (TH)
-    //   Some tokens (e.g. MKR) have metadata fields (name / symbol) encoded as bytes32 instead of the string prescribed
-    //   by the ERC20 specification.
-    //   This may cause issues when trying to consume metadata from these tokens.
-    //
-    describe('string metadata', () => {
-      it('name', async () => {
-        const outputs = gem.interface.functions["name()"].outputs;
-        want(outputs.length).to.equal(1);
-        want(outputs[0].type).to.equal('string');
-      })
-      it('symbol', async () => {
-        const outputs = gem.interface.functions["symbol()"].outputs;
-        want(outputs.length).to.equal(1);
-        want(outputs[0].type).to.equal('string');
-      })
     })
 
     // No Revert on Failure (AT)

@@ -19,8 +19,8 @@
 pragma solidity 0.8.13;
 
 contract Gem {
-    string  public name;
-    string  public symbol;
+    bytes32 public name;
+    bytes32 public symbol;
     uint256 public totalSupply;
     uint8   public constant decimals = 18;
 
@@ -48,7 +48,7 @@ contract Gem {
     error ErrUnderflow();
     error ErrWard();
 
-    constructor(string memory name_, string memory symbol_)
+    constructor(bytes32 name_, bytes32 symbol_)
       payable
     {
         name = name_;
@@ -177,7 +177,7 @@ contract GemFab {
 
     event Build(address indexed caller, address indexed gem);
 
-    function build(string memory name, string memory symbol)
+    function build(bytes32 name, bytes32 symbol)
       payable external returns (Gem gem)
     {
         gem = new Gem(name, symbol);
@@ -188,4 +188,3 @@ contract GemFab {
         return gem;
     }
 }
-
