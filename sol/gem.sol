@@ -123,7 +123,7 @@ contract Gem {
             uint256 prevA   = allowance[src][msg.sender];
 
             emit Transfer(src, dst, wad);
-            assembly{ log1(0, 0, caller()) }
+            assembly{ log2(0, 0, 0, caller()) }
 
             if ( prevA != type(uint256).max ) {
                 allowance[src][msg.sender] = prevA - wad;
