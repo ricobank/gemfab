@@ -7,10 +7,10 @@ import './task/deploy-gemfab'
  */
 export default {
   paths: {
-    sources: "./sol"
+    sources: "./src"
   },
   solidity: {
-    version: '0.8.13',
+    version: '0.8.15',
     settings: {
       optimizer: {
         enabled: true,
