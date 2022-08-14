@@ -15,7 +15,7 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-pragma solidity 0.8.13;
+pragma solidity ^0.8.15;
 
 contract Gem {
     bytes32 public name;
@@ -135,7 +135,6 @@ contract Gem {
             uint256 prevA   = allowance[src][msg.sender];
 
             emit Transfer(src, dst, wad);
-            assembly{ log1(0, 0, caller()) }
 
             if ( prevA != type(uint256).max ) {
                 allowance[src][msg.sender] = prevA - wad;
