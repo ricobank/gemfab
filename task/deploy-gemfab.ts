@@ -15,8 +15,8 @@ task('deploy-gemfab', 'deploy GemFab')
 
     debug(`Deploying contracts using ${deployer} to ${network.name}`)
 
-    const GemArtifact = require('../artifacts/sol/gem.sol/Gem.json')
-    const GemFabArtifact = require('../artifacts/sol/gem.sol/GemFab.json')
+    const GemArtifact = require('../artifacts/src/gem.sol/Gem.json')
+    const GemFabArtifact = require('../artifacts/src/gem.sol/GemFab.json')
     const GemFabDeployer = ethers.ContractFactory.fromSolidity(GemFabArtifact, acct)
     const gf = await GemFabDeployer.deploy()
     await gf.deployed()
