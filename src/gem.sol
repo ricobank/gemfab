@@ -26,7 +26,7 @@ contract Gem {
     mapping (address => uint)                      public balanceOf;
     mapping (address => mapping (address => uint)) public allowance;
     mapping (address => uint)                      public nonces;
-    mapping (address => bool)                      public halts;
+    mapping (address => bool)                      public halted;
     mapping (address => bool)                      public wards;
 
     bytes32 immutable DOMAIN_SUBHASH = keccak256(
@@ -99,11 +99,11 @@ contract Gem {
         }
     }
 
-    function halt(address usr, bool halted)
+    function halt(address usr, bool halt)
       payable external
     {
         if (!wards[msg.sender]) revert ErrWard();
-        halts[usr] = halted;
+        halted[usr] = halt;
     }
 
     function transfer(address dst, uint wad)
@@ -118,7 +118,7 @@ contract Gem {
             if( prev < wad ) {
                 revert ErrUnderflow();
             }
-            if( halts[msg.sender] ) {
+            if( halted[msg.sender] ) {
                 revert ErrHalted();
             }
         }
@@ -147,7 +147,7 @@ contract Gem {
                 revert ErrUnderflow();
             }
 
-            if( halts[src] ) {
+            if( halted[src] ) {
                 revert ErrHalted();
             }
         }
