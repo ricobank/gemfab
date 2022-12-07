@@ -20,7 +20,7 @@ pragma solidity ^0.8.15;
 contract Gem {
     bytes32 public name;
     bytes32 public symbol;
-    uint256 public totalSupply;
+    uint    public totalSupply;
     uint8   public constant decimals = 18;
 
     mapping (address => uint)                      public balanceOf;
@@ -35,10 +35,10 @@ contract Gem {
         'Permit(address owner,address spender,uint256 value,uint256 nonce,uint256 deadline)'
     );
 
-    event Approval(address indexed src, address indexed usr, uint256 wad);
-    event Transfer(address indexed src, address indexed dst, uint256 wad);
-    event Mint(address indexed caller, address indexed user, uint256 wad);
-    event Burn(address indexed caller, address indexed user, uint256 wad);
+    event Approval(address indexed src, address indexed usr, uint wad);
+    event Transfer(address indexed src, address indexed dst, uint wad);
+    event Mint(address indexed caller, address indexed user, uint wad);
+    event Burn(address indexed caller, address indexed user, uint wad);
     event Ward(address indexed setter, address indexed user, bool authed);
 
     error ErrPermitDeadline();
@@ -71,7 +71,7 @@ contract Gem {
         if (!wards[msg.sender]) revert ErrWard();
         // only need to check totalSupply for overflow
         unchecked {
-            uint256 prev = totalSupply;
+            uint prev = totalSupply;
             if (prev + wad < prev) {
                 revert ErrOverflow();
             }
@@ -87,7 +87,7 @@ contract Gem {
         if (!wards[msg.sender]) revert ErrWard();
         // only need to check balanceOf[usr] for underflow
         unchecked {
-            uint256 prev = balanceOf[usr];
+            uint prev = balanceOf[usr];
             balanceOf[usr] = prev - wad;
             totalSupply    -= wad;
             emit Burn(msg.sender, usr, wad);
@@ -102,7 +102,7 @@ contract Gem {
     {
         unchecked {
             ok = true;
-            uint256 prev = balanceOf[msg.sender];
+            uint prev = balanceOf[msg.sender];
             balanceOf[msg.sender] = prev - wad;
             balanceOf[dst]       += wad;
             emit Transfer(msg.sender, dst, wad);
@@ -118,13 +118,13 @@ contract Gem {
         unchecked {
             ok              = true;
             balanceOf[dst] += wad;
-            uint256 prevB   = balanceOf[src];
+            uint prevB   = balanceOf[src];
             balanceOf[src]  = prevB - wad;
-            uint256 prevA   = allowance[src][msg.sender];
+            uint prevA   = allowance[src][msg.sender];
 
             emit Transfer(src, dst, wad);
 
-            if ( prevA != type(uint256).max ) {
+            if ( prevA != type(uint).max ) {
                 allowance[src][msg.sender] = prevA - wad;
                 if( prevA < wad ) {
                     revert ErrUnderflow();
@@ -146,7 +146,7 @@ contract Gem {
     }
 
     // EIP-2612
-    function permit(address owner, address spender, uint256 value, uint256 deadline,
+    function permit(address owner, address spender, uint value, uint deadline,
                     uint8 v, bytes32 r, bytes32 s)
       payable external
     {
