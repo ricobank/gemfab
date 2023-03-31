@@ -39,11 +39,35 @@ rule basicMintSpec {
     require(balanceOf(e.msg.sender) + balanceOf(recip) < totalSupply());
     address ward = e.msg.sender;
     mathint balance_recip_before = balanceOf(recip);
+    mathint total_supply_before = totalSupply();
+
     ward(e, ward, true);
     mint(e, recip, amount);
-    mathint balance_recip_after = balanceOf(recip);
 
-    assert balance_recip_after == balance_recip_before + amount, "did not increase on mint";
+    mathint balance_recip_after = balanceOf(recip);
+    mathint total_supply_after = totalSupply();
+
+    assert balance_recip_after == balance_recip_before + amount, "recip balance did not increase on mint";
+    assert total_supply_after == total_supply_before + amount, "total supply did not increase correctly";
 
 }
 
+rule mintMustNeverOverflow {
+        address recip; uint amount;
+    
+    env e;
+    require(totalSupply() + amount > max_uint256);
+
+    mint@withrevert(e, recip, amount);
+    assert lastReverted, "mint must revert if total supply overflows";
+}
+
+rule burnMustNeverUnderflow {
+        address recip; uint amount;
+    
+    env e;
+    require(balanceOf(recip) < amount);
+
+    burn@withrevert(e, recip, amount);
+    assert lastReverted, "burn must revert if total supply underflows";
+}
