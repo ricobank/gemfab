@@ -62,6 +62,20 @@ rule mintMustNeverOverflow {
     assert lastReverted, "mint must revert if total supply overflows";
 }
 
+rule burnMustAlwaysDecreaseBalanceAndTotalSupply() {
+        address burn; uint amount;
+    env e;
+    require(balanceOf(burn) <= amount);
+    require(balanceOf(burn) <= totalSupply());
+
+    mathint total_supply_before = totalSupply();
+    mathint balance_before = balanceOf(burn);
+    burn(e, burn, amount);
+
+    assert totalSupply() == total_supply_before - amount, "totalSupply did not decrease by burn amount";
+    assert balanceOf(burn) == balance_before - amount, "usr balance did not decrease by burn amount";
+}
+
 rule burnMustNeverUnderflow {
         address recip; uint amount;
     
@@ -71,3 +85,4 @@ rule burnMustNeverUnderflow {
     burn@withrevert(e, recip, amount);
     assert lastReverted, "burn must revert if total supply underflows";
 }
+
