@@ -2,6 +2,14 @@ methods {
     balanceOf(address)         returns(uint) envfree
     allowance(address,address) returns(uint) envfree
     totalSupply()              returns(uint) envfree
+    wards(address)             returns(bool) envfree
+}
+
+ghost uint ghostSupply;
+
+hook Sstore balanceOf[KEY address own] uint256 new_balance (uint256 old_balance) STORAGE {
+    // holds for transfers because net value of writes on balanceOf should be 0
+    ghostSupply = ghostSupply + (new_balance - old_balance);
 }
 
 rule basicTransferSpec {
@@ -50,20 +58,6 @@ rule mintMustAlwaysIncreaseBalanceAndTotalSupply {
 
 }
 
-rule mintAndBurnMustAlwaysRequireWard {
-        address other; uint amount;
-
-    env e;
-    address sender = e.msg.sender;
-    ward(e, sender, false);
-
-    mint@withrevert(e, other, amount);
-    assert lastReverted, "mint did not revert with non-ward sender";
-
-    burn@withrevert(e, other, amount);
-    assert lastReverted, "burn did not revert with non-ward sender";
-}
-
 rule mintMustNeverOverflow {
         address recip; uint amount;
     
@@ -102,3 +96,42 @@ rule burnMustNeverUnderflow {
     assert lastReverted, "burn must revert if total supply underflows";
 }
 
+rule mintAndBurnMustAlwaysRequireWard {
+        address other; uint amount;
+
+    env e;
+    address sender = e.msg.sender;
+    ward(e, sender, false);
+
+    mint@withrevert(e, other, amount);
+    assert lastReverted, "mint did not revert with non-ward sender";
+
+    burn@withrevert(e, other, amount);
+    assert lastReverted, "burn did not revert with non-ward sender";
+}
+
+rule wardSpec {
+        address other_ward;
+    
+    env e;
+    address sender = e.msg.sender;
+    require(wards(sender) == true); // for this spec, assume sender is already a ward
+
+    ward(e, other_ward, true);
+    assert wards(other_ward) == true; // should always succeed
+
+}
+
+rule totalSupplyInvariant(method f) {
+        calldataarg args;
+    
+    env e;
+    mathint total_supply_before = totalSupply();
+    require(total_supply_before == ghostSupply); // must be true at all times
+
+    sinvoke f(e, args);
+
+    mathint total_supply_after = totalSupply();
+    assert total_supply_after == ghostSupply, "total_supply diverged from balanceOf storage writes";
+  
+}
