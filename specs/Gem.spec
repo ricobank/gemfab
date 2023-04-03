@@ -3,6 +3,9 @@ methods {
     allowance(address,address) returns(uint) envfree
     totalSupply()              returns(uint) envfree
     wards(address)             returns(bool) envfree
+    transferFrom(address,address,uint) returns(bool)
+    mint(address,uint)
+    burn(address,uint)
 }
 
 ghost uint ghostSupply;
@@ -118,7 +121,51 @@ rule wardSpec {
     require(wards(sender) == true); // for this spec, assume sender is already a ward
 
     ward(e, other_ward, true);
-    assert wards(other_ward) == true; // should always succeed
+    assert wards(other_ward) == true;
+
+    ward(e, other_ward, false);
+    assert wards(other_ward) == false;
+
+}
+
+rule approveSpec {
+        address spender; uint amount;
+    
+    env e;
+
+    approve(e, spender, amount);
+
+    assert allowance(e.msg.sender, spender) == amount, "spender allowance does not match intended amount";
+}
+
+rule transferFromMustHaveProperAllowance {
+        address owner; address receiver; uint amount;
+    
+    env e;
+    address spender = e.msg.sender;
+    mathint total_supply_before = totalSupply();
+    mathint owner_balance_before = balanceOf(owner);
+    mathint receiver_balance_before = balanceOf(receiver);
+    mathint spender_balance_before = balanceOf(spender);
+    mathint allowance_before = allowance(owner, spender);
+
+    require(owner_balance_before >= amount);
+    require(owner_balance_before + receiver_balance_before <= total_supply_before);
+
+    bool transfer_ok = transferFrom@withrevert(e, owner, receiver, amount);
+    bool transfer_reverted = lastReverted;
+    mathint receiver_balance_after = balanceOf(receiver);
+    mathint owner_balance_after = balanceOf(owner);
+
+    if (transfer_reverted) {
+        assert (allowance_before < amount || amount == 0), "transfer reverted despite adequate allowance";
+        assert allowance_before == allowance(owner, spender), "allowance changed in reverted transfer";
+    } else {
+        assert balanceOf(owner) == owner_balance_before - amount, "Owner balance did not decrease by spender amount";
+        assert balanceOf(receiver) == receiver_balance_before + amount, "Receiver balance did not increase by spender amount";
+        assert allowance(owner, spender) == allowance_before - amount, "Allowance did not decrease by spender amount";
+        assert total_supply_before == totalSupply(), "Total supply changed during transferFrom";
+    }
 
 }
 
