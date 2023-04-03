@@ -152,10 +152,10 @@ rule transferFromMustAllowAllowanceTransfer {
     require(allowance_before >= amount);
     require(owner_balance_before + receiver_balance_before <= total_supply_before);
 
-    bool transfer_ok = transferFrom@withrevert(e, owner, receiver, amount);
+    transferFrom@withrevert(e, owner, receiver, amount);
     bool transfer_reverted = lastReverted;
 
-    if (!transfer_ok) {
+    if (transfer_reverted) {
         assert allowance_before < amount, "transfer reverted despite adequate allowance";
         assert allowance_before == allowance(owner, spender), "allowance changed in reverted transfer";
     } else {
