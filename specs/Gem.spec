@@ -138,7 +138,7 @@ rule approveSpec {
     assert allowance(e.msg.sender, spender) == amount, "spender allowance does not match intended amount";
 }
 
-rule transferFromMustHaveProperAllowance {
+rule transferFromMustAllowAllowanceTransfer {
         address owner; address receiver; uint amount;
     
     env e;
@@ -150,15 +150,14 @@ rule transferFromMustHaveProperAllowance {
     mathint allowance_before = allowance(owner, spender);
 
     require(owner_balance_before >= amount);
+    require(allowance_before >= amount);
     require(owner_balance_before + receiver_balance_before <= total_supply_before);
 
     bool transfer_ok = transferFrom@withrevert(e, owner, receiver, amount);
     bool transfer_reverted = lastReverted;
-    mathint receiver_balance_after = balanceOf(receiver);
-    mathint owner_balance_after = balanceOf(owner);
 
-    if (transfer_reverted) {
-        assert (allowance_before < amount || amount == 0), "transfer reverted despite adequate allowance";
+    if (!transfer_ok) {
+        assert allowance_before < amount, "transfer reverted despite adequate allowance";
         assert allowance_before == allowance(owner, spender), "allowance changed in reverted transfer";
     } else {
         assert balanceOf(owner) == owner_balance_before - amount, "Owner balance did not decrease by spender amount";
