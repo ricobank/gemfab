@@ -149,7 +149,6 @@ rule transferFromMustAllowAllowanceTransfer {
     mathint spender_balance_before = balanceOf(spender);
     mathint allowance_before = allowance(owner, spender);
 
-    require(allowance_before >= amount);
     require(owner_balance_before + receiver_balance_before <= total_supply_before);
 
     transferFrom@withrevert(e, owner, receiver, amount);
