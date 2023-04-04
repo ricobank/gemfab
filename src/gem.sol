@@ -119,7 +119,7 @@ contract Gem {
             ok              = true;
             uint256 prevB   = balanceOf[src];
             balanceOf[dst] += wad;
-            balanceOf[src] -= wad;
+            balanceOf[src]  = prevB - wad;
             uint256 prevA   = allowance[src][msg.sender];
 
             emit Transfer(src, dst, wad);

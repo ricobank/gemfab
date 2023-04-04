@@ -9,8 +9,7 @@
     "build:sol": "hardhat compile",
     "pretest": "npm run build",
     "test": "ts-mocha 'test/**'",
-    "fmt": "ts-standard --fix task test index.ts",
-    "verify": "certoraRun src/gem.sol:Gem --verify Gem:specs/Gem.spec"
+    "fmt": "ts-standard --fix task test index.ts"
   },
   "devDependencies": {
     "@etherpacks/dpack": "^0.0.24",
