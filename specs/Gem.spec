@@ -180,18 +180,20 @@ rule transferFromSpec(address src, address dst, uint amt) {
 }
 
 // TODO: investigate this spec
-/*rule transferFromRevertSpec(address src, address dst, uint amt) {
+rule transferFromRevertSpec(address src, address dst, uint amt) {
 
     env e;
     address sender = e.msg.sender;
     require(allowance(src, sender) < amt || balanceOf(src) < amt);
+    require(amt > 0);
+    require(allowance(src, sender) < max_uint256);
 
     transferFrom@withrevert(e, src, dst, amt);
 
-    assert lastReverted, "transferFrom did not revert when expected to";
+    assert lastReverted || src == dst, "transferFrom did not revert when expected to";
 
 
-}*/
+}
 
 rule totalSupplyInvariant(method f) {
         calldataarg args;
@@ -205,4 +207,18 @@ rule totalSupplyInvariant(method f) {
     mathint total_supply_after = totalSupply();
     assert total_supply_after == ghostSupply, "total_supply diverged from balanceOf storage writes";
   
+}
+
+rule transferToSelfInvestigation(address src, address dst, uint amt) {
+    env e;
+    require(src == dst); // for this experiment
+    
+    mathint balance_src_before = balanceOf(src);
+    require(balance_src_before < amt); // src has insufficient balance
+    require(allowance(e.msg.sender, src) >= amt); // sender has sufficient approval
+
+    transferFrom@withrevert(e, src, dst, amt);
+    bool reverted = lastReverted;
+    mathint balance_src_after = balanceOf(src);
+    assert reverted, "transfer did not revert";
 }
