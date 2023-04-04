@@ -156,7 +156,6 @@ rule approveSpec {
 }
 
 rule transferFromSpec(address src, address dst, uint amt) {
-    require(src != dst);
 
     env e;
     address sender = e.msg.sender;
@@ -171,10 +170,22 @@ rule transferFromSpec(address src, address dst, uint amt) {
 
     transferFrom(e, src, dst, amt);
 
-    assert balanceOf(src) == balance_src_before - amt, "src balance did not decrease by transferFrom amt";
-    assert balanceOf(dst) == balance_dst_before + amt, "dst balance did not increase by transferFrom amt";
-    assert allowance(src, sender) == allowance_before - amt || allowance_before == max_uint256, 
+    // true to matter what
+    assert allowance(src, sender) == allowance_before - amt 
+            || (allowance_before == max_uint256 && allowance_before == allowance(src, sender)), 
         "allowance did not decrease by transferFrom amt";
+
+    // conditionals
+    if(src != dst){
+        assert balanceOf(src) == balance_src_before - amt, "src balance did not decrease by transferFrom amt";
+        assert balanceOf(dst) == balance_dst_before + amt, "dst balance did not increase by transferFrom amt";
+    } else {
+        assert balanceOf(src) == balanceOf(dst) 
+            && balanceOf(src) == balance_src_before
+            && balanceOf(dst) == balance_dst_before
+            && balance_dst_before == balance_src_before, 
+            "balances changed despite transferring to self";
+    }
 }
 
 // TODO: investigate this spec
