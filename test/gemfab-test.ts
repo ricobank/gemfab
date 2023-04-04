@@ -75,13 +75,26 @@ describe('gemfab', () => {
       await fail('ErrUnderflow', gem.burn, ALI, 101);
   });
 
-  it('transferFrom self', async () => {
+  it('transferFrom self insufficient bal', async () => {
+    await send(gem.mint, BOB, 100);
     const balbob = await gem.balanceOf(BOB);
     const gembob = gem.connect(bob)
     await send(gembob.approve, ALI, balbob + 1);
     const alibob = gem.connect(ali)
     await fail('ErrUnderflow', alibob.transferFrom, BOB, BOB, balbob + 1);
-  })
+  });
+
+  it('transferFrom self sufficient bal', async () => {
+    await send(gem.mint, BOB, 100);
+    const balbob = await gem.balanceOf(BOB);
+    const gembob = gem.connect(bob)
+    await send(gembob.approve, ALI, balbob);
+    const alibob = gem.connect(ali)
+    await send(alibob.transferFrom, BOB, BOB, balbob);
+    want((await gem.balanceOf(BOB)).toNumber()).equal(balbob.toNumber());
+  });
+
+
 
   describe('coverage', () => {
     describe('mint', () => {
