@@ -117,9 +117,9 @@ contract Gem {
     {
         unchecked {
             ok              = true;
-            balanceOf[dst] += wad;
             uint256 prevB   = balanceOf[src];
-            balanceOf[src]  = prevB - wad;
+            balanceOf[dst] += wad;
+            balanceOf[src] -= wad;
             uint256 prevA   = allowance[src][msg.sender];
 
             emit Transfer(src, dst, wad);
