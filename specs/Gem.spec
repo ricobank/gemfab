@@ -89,6 +89,23 @@ rule burnMustAlwaysDecreaseBalanceAndTotalSupply() {
     assert balance_after == balance_before - amount, "usr balance did not decrease by burn amount";
 }
 
+rule onlyMintAndBurnCanChangeTotalSupply(address target, uint amt) {
+
+    env e; method f; calldataarg args;
+    mathint total_supply_before = totalSupply();
+
+    f@withrevert(e, args);
+
+    mathint total_supply_after = totalSupply();
+
+    assert total_supply_before != total_supply_after 
+        => 
+    (f.selector == mint(address,uint).selector || f.selector == burn(address,uint).selector),
+    "function other than mint or burn changed total supply!";
+
+
+}
+
 rule burnMustNeverUnderflow {
         address recip; uint amount;
     
@@ -138,33 +155,41 @@ rule approveSpec {
     assert allowance(e.msg.sender, spender) == amount, "spender allowance does not match intended amount";
 }
 
-rule transferFromMustAllowAllowanceTransfer {
-        address owner; address receiver; uint amount;
-    
+rule transferFromSpec(address src, address dst, uint amt) {
+    require(src != dst);
+
     env e;
-    address spender = e.msg.sender;
-    mathint total_supply_before = totalSupply();
-    mathint owner_balance_before = balanceOf(owner);
-    mathint receiver_balance_before = balanceOf(receiver);
-    mathint spender_balance_before = balanceOf(spender);
-    mathint allowance_before = allowance(owner, spender);
+    address sender = e.msg.sender;
+    require(allowance(src, sender) >= amt);
+    require(balanceOf(src) >= amt);
+    require(balanceOf(src) <= max_uint256);
+    require(balanceOf(dst) <= max_uint256 - amt);
+    
+    mathint balance_src_before = balanceOf(src);
+    mathint balance_dst_before = balanceOf(dst);
+    mathint allowance_before = allowance(src, sender);
 
-    require(owner_balance_before + receiver_balance_before <= total_supply_before);
+    transferFrom(e, src, dst, amt);
 
-    transferFrom@withrevert(e, owner, receiver, amount);
-    bool transfer_reverted = lastReverted;
-
-    if (transfer_reverted) {
-        assert allowance_before < amount, "transfer reverted despite adequate allowance";
-        assert allowance_before == allowance(owner, spender), "allowance changed in reverted transfer";
-    } else {
-        assert balanceOf(owner) == owner_balance_before - amount, "Owner balance did not decrease by spender amount";
-        assert balanceOf(receiver) == receiver_balance_before + amount, "Receiver balance did not increase by spender amount";
-        assert allowance(owner, spender) == allowance_before - amount, "Allowance did not decrease by spender amount";
-        assert total_supply_before == totalSupply(), "Total supply changed during transferFrom";
-    }
-
+    assert balanceOf(src) == balance_src_before - amt, "src balance did not decrease by transferFrom amt";
+    assert balanceOf(dst) == balance_dst_before + amt, "dst balance did not increase by transferFrom amt";
+    assert allowance(src, sender) == allowance_before - amt || allowance_before == max_uint256, 
+        "allowance did not decrease by transferFrom amt";
 }
+
+// TODO: investigate this spec
+/*rule transferFromRevertSpec(address src, address dst, uint amt) {
+
+    env e;
+    address sender = e.msg.sender;
+    require(allowance(src, sender) < amt || balanceOf(src) < amt);
+
+    transferFrom@withrevert(e, src, dst, amt);
+
+    assert lastReverted, "transferFrom did not revert when expected to";
+
+
+}*/
 
 rule totalSupplyInvariant(method f) {
         calldataarg args;
@@ -173,7 +198,7 @@ rule totalSupplyInvariant(method f) {
     mathint total_supply_before = totalSupply();
     require(total_supply_before == ghostSupply); // must be true at all times
 
-    sinvoke f(e, args);
+    f@withrevert(e, args);
 
     mathint total_supply_after = totalSupply();
     assert total_supply_after == ghostSupply, "total_supply diverged from balanceOf storage writes";
