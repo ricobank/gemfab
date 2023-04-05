@@ -189,7 +189,7 @@ rule transferFromRevertSpec(address src, address dst, uint amt) {
 
     transferFrom@withrevert(e, src, dst, amt);
 
-    assert lastReverted || src == dst, "transferFrom did not revert when expected to";
+    assert lastReverted, "transferFrom did not revert when expected to";
 
 
 }
