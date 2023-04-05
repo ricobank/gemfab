@@ -183,9 +183,11 @@ rule transferFromRevertSpec(address src, address dst, uint amt) {
 
     env e;
     address sender = e.msg.sender;
-    require(allowance(src, sender) < amt || balanceOf(src) < amt);
-    require(amt > 0);
-    require(allowance(src, sender) < max_uint256);
+    mathint balance_src = balanceOf(src);
+    mathint balance_dst = balanceOf(dst);
+
+    require(balance_src + balance_dst <= max_uint256);
+    require(allowance(src, sender) < amt || balanceOf(src) < amt || balanceOf(dst) > max_uint256 - amt);
 
     transferFrom@withrevert(e, src, dst, amt);
 
