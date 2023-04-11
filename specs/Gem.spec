@@ -15,7 +15,7 @@ hook Sstore balanceOf[KEY address own] uint256 new_balance (uint256 old_balance)
     ghostSupply = ghostSupply + (new_balance - old_balance);
 }
 
-rule transferSpec(address recip, uint amt) {
+rule transferMustDecreaseSenderBalanceAndIncreaseRecipientBalance(address recip, uint amt) {
 
     env e;
     address sender = e.msg.sender;
@@ -42,7 +42,7 @@ rule transferSpec(address recip, uint amt) {
         "transfer must not change sender's gem balance when recip is self";
 }
 
-rule mintSupplyBalanceSpec(address recip, uint amt) {
+rule mintMustIncreaseBalanceAndTotalSupply(address recip, uint amt) {
     
     env e;
     require(balanceOf(e.msg.sender) + balanceOf(recip) < totalSupply());
@@ -59,7 +59,7 @@ rule mintSupplyBalanceSpec(address recip, uint amt) {
 
 }
 
-rule mintOverflowSpec(address recip, uint amt) {
+rule mintMustRevertOnOverflow(address recip, uint amt) {
     
     env e;
     mathint total_supply = totalSupply();
@@ -69,7 +69,7 @@ rule mintOverflowSpec(address recip, uint amt) {
     assert lastReverted, "mint must revert if total supply overflows";
 }
 
-rule burnSupplyBalanceSpec(address burn, uint amt) {
+rule burnMustDecreaseBalanceAndTotalSupply(address burn, uint amt) {
 
     env e;
     require(balanceOf(burn) <= amt);
@@ -86,7 +86,7 @@ rule burnSupplyBalanceSpec(address burn, uint amt) {
     assert balance_after == balance_before - amt, "usr balance did not decrease by burn amount";
 }
 
-rule burnUnderflowSpec(address recip, uint amt) {
+rule burnMustRevertOnUnderflow(address recip, uint amt) {
     
     env e;
     require(balanceOf(recip) < amt);
@@ -95,7 +95,7 @@ rule burnUnderflowSpec(address recip, uint amt) {
     assert lastReverted, "burn must revert if total supply underflows";
 }
 
-rule mintAndBurnWardSpec(address other, uint amt) {
+rule mintAndBurnRequireWard(address other, uint amt) {
 
     env e;
     address sender = e.msg.sender;
@@ -109,7 +109,7 @@ rule mintAndBurnWardSpec(address other, uint amt) {
 }
 
 
-rule totalSupplySpec(address target, uint amt) {
+rule totalSupplyOnlyChangedByMintAndBurn(address target, uint amt) {
 
     env e; method f; calldataarg args;
     mathint total_supply_before = totalSupply();
@@ -125,7 +125,7 @@ rule totalSupplySpec(address target, uint amt) {
     "function other than warded mint or burn changed total supply!";
 }
 
-rule wardSpec(address other_ward) {
+rule wardUpdatesUsrAuthedStatus(address other_ward) {
         
     env e;
     address sender = e.msg.sender;
@@ -139,14 +139,14 @@ rule wardSpec(address other_ward) {
 
 }
 
-rule approveSpec(address spender, uint amt) {
+rule approveUpdatesAllowanceForSpender(address spender, uint amt) {
     
     env e;
     approve(e, spender, amt);
     assert allowance(e.msg.sender, spender) == amt, "spender allowance does not match intended amount";
 }
 
-rule transferFromSpec(address src, address dst, uint amt) {
+rule transferFromUpdatesBalanceAndAllowanceOrIsSelfTransfer(address src, address dst, uint amt) {
 
     env e;
     address sender = e.msg.sender;
@@ -179,8 +179,7 @@ rule transferFromSpec(address src, address dst, uint amt) {
     }
 }
 
-rule transferFromRevertSpec(address src, address dst, uint amt) {
-
+rule transferFromRevertsWithInsufficientBalanceOrAllowanceOrOverflow(address src, address dst, uint amt) {
     env e;
     address sender = e.msg.sender;
     mathint balance_src = balanceOf(src);
@@ -196,14 +195,13 @@ rule transferFromRevertSpec(address src, address dst, uint amt) {
 
 }
 
-rule totalSupplyInvariant(method f) {
-        calldataarg args;
+rule totalSupplyIsSumOfAllBalanceOfValues(method f, calldataarg args) {
     
     env e;
     mathint total_supply_before = totalSupply();
     require(total_supply_before == ghostSupply); // must be true at all times
 
-    f@withrevert(e, args);
+    f(e, args);
 
     mathint total_supply_after = totalSupply();
     assert total_supply_after == ghostSupply, "total_supply diverged from balanceOf storage writes";
