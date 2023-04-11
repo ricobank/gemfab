@@ -42,6 +42,17 @@ rule transferMustDecreaseSenderBalanceAndIncreaseRecipientBalance(address recip,
         "transfer must not change sender's gem balance when recip is self";
 }
 
+rule transferMustRevertWithInsufficientBalance(address recip, uint amt) {
+
+    env e;
+    address sender = e.msg.sender;
+
+    require(balanceOf(sender) < amt);
+
+    transfer@withrevert(e, recip, amt);
+    assert lastReverted, "transfer did not revert with insufficient sender balance"; 
+}
+
 rule mintMustIncreaseBalanceAndTotalSupply(address recip, uint amt) {
     
     env e;
