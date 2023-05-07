@@ -22,7 +22,8 @@ task('deploy-gemfab', 'deploy GemFab')
     await gf.deployed()
     debug('GemFab deployed to : ', gf.address)
 
-    const pb = new dpack.PackBuilder(network.name)
+    const netname = network.name.replace('_fork', '')
+    const pb = new dpack.PackBuilder(netname)
     await pb.packObject({
       objectname: 'gemfab',
       typename: 'GemFab',
