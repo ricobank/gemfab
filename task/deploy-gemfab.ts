@@ -3,7 +3,7 @@ const debug = require('debug')('gemfab:task')
 const dpack = require('@etherpacks/dpack')
 
 const { task } = require('hardhat/config')
-const GASLIMIT = '1000000000000'
+const GASLIMIT = '100000000000'
 
 task('deploy-gemfab', 'deploy GemFab')
   .addFlag('stdout', 'print the dpack to stdout')
