@@ -3,11 +3,11 @@ const debug = require('debug')('gemfab:task')
 const dpack = require('@etherpacks/dpack')
 
 const { task } = require('hardhat/config')
-const GASLIMIT = '1000000000000'
 
 task('deploy-gemfab', 'deploy GemFab')
   .addFlag('stdout', 'print the dpack to stdout')
   .addOptionalParam('outfile', 'save the dpack to this path')
+  .addOptionalParam('gasLimit', 'gemfab deploy tx gas limit')
   .setAction(async (args, hre) => {
     const { ethers, network } = hre
 
@@ -19,7 +19,7 @@ task('deploy-gemfab', 'deploy GemFab')
     const GemArtifact = require('../artifacts/src/gem.sol/Gem.json')
     const GemFabArtifact = require('../artifacts/src/gem.sol/GemFab.json')
     const GemFabDeployer = ethers.ContractFactory.fromSolidity(GemFabArtifact, acct)
-    const gf = await GemFabDeployer.deploy({gasLimit: GASLIMIT})
+    const gf = await GemFabDeployer.deploy({gasLimit: args.gasLimit})
     await gf.deployed()
     debug('GemFab deployed to : ', gf.address)
 
