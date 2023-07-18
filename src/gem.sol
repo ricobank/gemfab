@@ -37,8 +37,6 @@ contract Gem {
 
     event Approval(address indexed src, address indexed usr, uint256 wad);
     event Transfer(address indexed src, address indexed dst, uint256 wad);
-    event Mint(address indexed caller, address indexed user, uint256 wad);
-    event Burn(address indexed caller, address indexed user, uint256 wad);
     event Ward(address indexed setter, address indexed user, bool authed);
 
     error ErrPermitDeadline();
@@ -77,7 +75,7 @@ contract Gem {
             }
             balanceOf[usr] += wad;
             totalSupply     = prev + wad;
-            emit Mint(msg.sender, usr, wad);
+            emit Transfer(address(0), usr, wad);
         }
     }
 
@@ -90,7 +88,7 @@ contract Gem {
             uint256 prev = balanceOf[usr];
             balanceOf[usr] = prev - wad;
             totalSupply    -= wad;
-            emit Burn(msg.sender, usr, wad);
+            emit Transfer(usr, address(0), wad);
             if (prev < wad) {
                 revert ErrUnderflow();
             }

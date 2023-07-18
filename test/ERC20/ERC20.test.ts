@@ -305,26 +305,13 @@ describe('ERC20', () => {
         expect(await this.token.balanceOf(recipient.address)).to.eql(amount);
       });
 
-      it('emits Mint event', async function () {
-        const event = expectEvent(this.rx, 'Mint', {
-          caller: initialHolder.address,
-          user: recipient.address,
+      it('emits Transfer event', async function () {
+        expectEvent(this.rx, 'Transfer', {
+          src: constants.AddressZero,
+          dst: recipient.address,
           wad: amount
         });
-
-        //expect(event.args.wad).to.eql(amount);
       });
-
-/*
-      it('emits Transfer event', async function () {
-        const event = expectEvent(this.rx, 'Transfer', {
-          src: ZERO_ADDRESS,
-          dst: recipient,
-        });
-
-        expect(event.args.wad).to.be.bignumber.equal(amount);
-      });
-*/
     });
   });
 
@@ -360,25 +347,13 @@ describe('ERC20', () => {
             expect(await this.token.balanceOf(initialHolder.address)).to.be.eql(expectedBalance);
           });
 
-          it('emits Burn event', async function () {
-            const event = expectEvent(this.rx, 'Burn', {
-              caller: initialHolder.address,
-              user: initialHolder.address,
+          it('emits Transfer event', async function () {
+            expectEvent(this.rx, 'Transfer', {
+              src: initialHolder.address,
+              dst: constants.AddressZero,
               wad: amount
             });
-
-            //expect(event.args.wad).to.eql(amount);
           });
-/*
-          it('emits Transfer event', async function () {
-            const event = expectEvent(this.rx, 'Transfer', {
-              src: initialHolder,
-              dst: ZERO_ADDRESS,
-            });
-
-            expect(event.args.wad).to.be.bignumber.equal(amount);
-          });
-*/
         });
       };
 
