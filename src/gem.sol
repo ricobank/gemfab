@@ -166,6 +166,47 @@ contract Gem {
         if (owner != signer) { revert ErrPermitSignature(); }
         if (block.timestamp > deadline) { revert ErrPermitDeadline(); }
     }
+
+
+    /* ----------------------- register with gateway routers without DAO proposals ----------------------- */
+    // could be used to send transactions as a gem to register with anything like gateway routers
+    // and also satisfy any interface requirements they have like token.isMadeForRollupX()
+
+    mapping (bytes4 => address) imps;
+
+    function assign(bytes4 sel, address imp)
+      payable external
+    {
+        if (!wards[msg.sender]) revert ErrWard();
+        imps[sel] = imp;
+    }
+
+    // OPTIONAL, could be removed and accessed through fallback instead
+    // used to call things as this gem like L1CustomGateway.registerTokenToL2, L1GatewayRouter.setGateway
+    function register(address code, bytes calldata data)
+      payable external
+    {
+        if (!wards[msg.sender]) revert ErrWard();
+        code.call(data);
+    }
+
+    // based on solidstate-solidity proxy.sol
+    // if process requires correct response to any check like token.isRollupEnabled(), allow any response
+    // or delegate to a register function in an implementation contract
+    fallback()
+      payable external
+    {
+        address imp = imps[msg.sig];
+        assembly {
+            calldatacopy(0, 0, calldatasize())
+            let result := delegatecall(gas(), imp, 0, calldatasize(), 0, 0)
+            returndatacopy(0, 0, returndatasize())
+
+            switch result
+            case 0 { revert(0, returndatasize()) }
+            default { return (0, returndatasize()) }
+        }
+    }
 }
 
 contract GemFab {
