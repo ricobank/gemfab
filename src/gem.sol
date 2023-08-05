@@ -37,6 +37,7 @@ contract Gem {
 
     event Approval(address indexed src, address indexed usr, uint256 wad);
     event Transfer(address indexed src, address indexed dst, uint256 wad);
+    event Caller(address indexed caller);
     event Ward(address indexed setter, address indexed user, bool authed);
 
     error ErrPermitDeadline();
@@ -120,14 +121,14 @@ contract Gem {
             balanceOf[dst] += wad;
             uint256 prevA   = allowance[src][msg.sender];
 
-            emit Transfer(src, dst, wad);
-
             if ( prevA != type(uint256).max ) {
                 allowance[src][msg.sender] = prevA - wad;
+                emit Approval(src, msg.sender, prevA - wad);
                 if( prevA < wad ) {
                     revert ErrUnderflow();
                 }
             }
+            emit Transfer(src, dst, wad);
 
             if( prevB < wad ) {
                 revert ErrUnderflow();

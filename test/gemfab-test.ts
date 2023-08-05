@@ -94,7 +94,16 @@ describe('gemfab', () => {
     want((await gem.balanceOf(BOB)).toNumber()).equal(balbob.toNumber());
   });
 
-
+  it('transferFrom max allowance no approval event', async () => {
+    await send(gem.mint, BOB, 100);
+    const amt = await gem.balanceOf(BOB);
+    await send(gem.connect(bob).approve, ALI, constants.MaxUint256);
+    const rx = await send(gem.connect(ali).transferFrom, BOB, CAT, amt);
+    try {
+        expectEvent(rx, 'Approval')
+        throw Error('transferFrom w max allowance emitted approval event')
+    } catch {}
+  })
 
   describe('coverage', () => {
     describe('mint', () => {
