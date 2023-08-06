@@ -37,7 +37,6 @@ contract Gem {
 
     event Approval(address indexed src, address indexed usr, uint256 wad);
     event Transfer(address indexed src, address indexed dst, uint256 wad);
-    event Caller(address indexed caller);
     event Ward(address indexed setter, address indexed user, bool authed);
 
     error ErrPermitDeadline();
