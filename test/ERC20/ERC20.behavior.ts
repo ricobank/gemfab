@@ -98,17 +98,16 @@ function shouldBehaveLikeERC20 (errorPrefix, initialSupply, _initialHolder, _rec
                 });
               });
 
-              /* // not required for EIP20
               it('emits an approval event', async function () {
-                const { logs } = await this.token.transferFrom(tokenOwner, to, amount, { from: spender });
+                const tx = await this.token.connect(spender).transferFrom(tokenOwner.address, to.address, amount);
+                const rx = await tx.wait()
 
-                expectEvent.inLogs(logs, 'Approval', {
-                  src: tokenOwner,
-                  usr: spender,
-                  wad: await this.token.allowance(tokenOwner, spender),
+                expectEvent(rx, 'Approval', {
+                  src: tokenOwner.address,
+                  usr: spender.address,
+                  wad: await this.token.allowance(tokenOwner.address, spender.address),
                 });
               });
-              */
             });
 
             describe('when the token owner does not have enough balance', function () {

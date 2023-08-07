@@ -120,14 +120,14 @@ contract Gem {
             balanceOf[dst] += wad;
             uint256 prevA   = allowance[src][msg.sender];
 
-            emit Transfer(src, dst, wad);
-
             if ( prevA != type(uint256).max ) {
                 allowance[src][msg.sender] = prevA - wad;
+                emit Approval(src, msg.sender, prevA - wad);
                 if( prevA < wad ) {
                     revert ErrUnderflow();
                 }
             }
+            emit Transfer(src, dst, wad);
 
             if( prevB < wad ) {
                 revert ErrUnderflow();
