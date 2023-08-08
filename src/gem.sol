@@ -43,6 +43,7 @@ contract Gem {
     error ErrPermitSignature();
     error ErrOverflow();
     error ErrUnderflow();
+    error ErrZeroDst();
     error ErrWard();
 
     constructor(bytes32 name_, bytes32 symbol_)
@@ -107,6 +108,9 @@ contract Gem {
             if( prev < wad ) {
                 revert ErrUnderflow();
             }
+            if (dst == address(0)) {
+                revert ErrZeroDst();
+            }
         }
     }
 
@@ -131,6 +135,9 @@ contract Gem {
 
             if( prevB < wad ) {
                 revert ErrUnderflow();
+            }
+            if (dst == address(0)) {
+                revert ErrZeroDst();
             }
         }
     }

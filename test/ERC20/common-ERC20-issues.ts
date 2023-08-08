@@ -653,14 +653,7 @@ describe('common-erc20-issues', () => {
     // Revert on Transfer to the Zero Address (TH)
     //   Some tokens (e.g. openzeppelin) revert when attempting to transfer to address(0).
     //   This may break systems that expect to be able to burn tokens by transfering them to address(0).
-    //
-    it('doesn\'t revert on transfer to zero address', async () => {
-      await send(gem.mint, ALI, 1);
-      want((await gem.balanceOf(ALI)).toNumber()).to.equal(1);
-      await send(gem.transfer, ethers.constants.AddressZero, 1);
-      want((await gem.balanceOf(ALI)).toNumber()).to.equal(0);
-    })
-
+    //   We agree with OZ
 
     // Revert on Large Approvals & Transfers (TH)
     //   Some tokens (e.g. UNI, COMP) revert if the value passed to approve or transfer is larger than uint96.
