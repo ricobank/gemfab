@@ -34,6 +34,12 @@ contract Gem {
     bytes32 immutable PERMIT_TYPEHASH = keccak256(
         'Permit(address owner,address spender,uint256 value,uint256 nonce,uint256 deadline)'
     );
+    function DOMAIN_SEPARATOR() external view returns (bytes32) {
+        return keccak256(abi.encode( DOMAIN_SUBHASH,
+            keccak256("GemPermit"), keccak256("0"),
+            block.chainid, address(this))
+        );
+    }
 
     event Approval(address indexed src, address indexed usr, uint256 wad);
     event Transfer(address indexed src, address indexed dst, uint256 wad);
