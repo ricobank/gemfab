@@ -83,6 +83,9 @@ contract Gem {
             balanceOf[usr] += wad;
             totalSupply     = prev + wad;
             emit Transfer(address(0), usr, wad);
+            if (usr == address(0)) {
+                revert ErrZeroDst();
+            }
         }
     }
 
