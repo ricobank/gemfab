@@ -28,8 +28,8 @@ const hre = require('hardhat');
 describe('ERC20Permit', () => {
   let initialHolder, spender, recipient, other;
 
-  const name = utils.formatBytes32String('GemPermit');
-  const symbol = utils.formatBytes32String('GEM');
+  const name = utils.formatBytes32String('GoodCoin');
+  const symbol = utils.formatBytes32String('GCN');
   const version = '0';
 
   const initialSupply = BigNumber.from(100);
@@ -75,15 +75,20 @@ describe('ERC20Permit', () => {
     expect(await this.token.nonces(initialHolder.address)).to.eql(constants.Zero);
   });
 
-  /*
   it('domain separator', async function () {
     expect(
       await this.token.DOMAIN_SEPARATOR(),
     ).to.equal(
-      await domainSeparator(name, version, this.chainId, this.token.address),
+      ethers.utils._TypedDataEncoder.hashDomain(
+        {
+          name: 'GemPermit',
+          version,
+          chainId: this.chainId,
+          verifyingContract: this.token.address
+        }
+      )
     );
   });
-   */
 
   describe('permit', function () {
     const types = {
