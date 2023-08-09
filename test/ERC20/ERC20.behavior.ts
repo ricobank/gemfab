@@ -9,6 +9,7 @@ const { expect } = require('chai');
 const expectRevert = async (f, msg) => { await expect(f).rejectedWith(msg) }
 const { expectEvent } = require('./helpers')
 import {BigNumber, constants} from 'ethers'
+const ZERO_ADDRESS = constants.AddressZero
 
 function shouldBehaveLikeERC20 (errorPrefix, initialSupply, _initialHolder, _recipient, _anotherAccount) {
   {
@@ -42,7 +43,7 @@ function shouldBehaveLikeERC20 (errorPrefix, initialSupply, _initialHolder, _rec
     describe('transfer', function () {
       shouldBehaveLikeERC20Transfer(errorPrefix, _initialHolder, _recipient, initialSupply,
           function (from, to, value) {
-            return this.token.connect(from).transfer(to.address, value);
+            return this.token.connect(from).transfer(to, value);
           },
       );
     });
@@ -148,22 +149,20 @@ function shouldBehaveLikeERC20 (errorPrefix, initialSupply, _initialHolder, _rec
           });
         });
 
-        /*
         describe('when the recipient is the zero address', function () {
           const amount = initialSupply;
           const to = ZERO_ADDRESS;
 
           beforeEach(async function () {
-            await this.token.approve(spender, amount, { from: tokenOwner });
+            await this.token.connect(tokenOwner).approve(spender.address, amount);
           });
 
           it('reverts', async function () {
-            await expectRevert(this.token.transferFrom(
-              tokenOwner, to, amount, { from: spender }), `${errorPrefix}: transfer to the zero address`,
+            await expectRevert(this.token.connect(spender).transferFrom(
+              tokenOwner.address, to, amount), `ErrZeroDst()`,
             );
           });
         });
-        */
       });
 
       /*
@@ -204,7 +203,7 @@ function shouldBehaveLikeERC20Transfer (errorPrefix, _from, _to, balance, transf
         const amount = balance.add(1);
 
         it('reverts', async function () {
-          await expectRevert(transfer.call(this, from, to, amount), `ErrUnderflow`,
+          await expectRevert(transfer.call(this, from, to.address, amount), `ErrUnderflow`,
           );
         });
       });
@@ -213,7 +212,7 @@ function shouldBehaveLikeERC20Transfer (errorPrefix, _from, _to, balance, transf
         const amount = balance;
 
         it('transfers the requested amount', async function () {
-          await transfer.call(this, from, to, amount);
+          await transfer.call(this, from, to.address, amount);
 
           expect(await this.token.balanceOf(from.address)).to.eql(constants.Zero);
 
@@ -221,7 +220,7 @@ function shouldBehaveLikeERC20Transfer (errorPrefix, _from, _to, balance, transf
         });
 
         it('emits a transfer event', async function () {
-          const tx = await transfer.call(this, from, to, amount);
+          const tx = await transfer.call(this, from, to.address, amount);
           const rx = await tx.wait()
 
           expectEvent(rx, 'Transfer', {
@@ -236,7 +235,7 @@ function shouldBehaveLikeERC20Transfer (errorPrefix, _from, _to, balance, transf
         const amount = constants.Zero;
 
         it('transfers the requested amount', async function () {
-          await transfer.call(this, from, to, amount);
+          await transfer.call(this, from, to.address, amount);
 
           expect(await this.token.balanceOf(from.address)).to.eql(balance);
 
@@ -244,7 +243,7 @@ function shouldBehaveLikeERC20Transfer (errorPrefix, _from, _to, balance, transf
         });
 
         it('emits a transfer event', async function () {
-          const tx = await transfer.call(this, from, to, amount);
+          const tx = await transfer.call(this, from, to.address, amount);
           const rx = await tx.wait()
 
           expectEvent(rx, 'Transfer', {
@@ -255,17 +254,14 @@ function shouldBehaveLikeERC20Transfer (errorPrefix, _from, _to, balance, transf
         });
       });
     });
+    describe('when the recipient is the zero address', function () {
+      it('reverts', async function () {
+        await expectRevert(transfer.call(this, from, ZERO_ADDRESS, balance), `ErrZeroDst()`);
+      });
+    });
+
   }
 
-  /*
-  describe('when the recipient is the zero address', function () {
-    it('reverts', async function () {
-      await expectRevert(transfer.call(this, from, ZERO_ADDRESS, balance),
-        `${errorPrefix}: transfer to the zero address`,
-      );
-    });
-  });
-  */
 }
 
 function shouldBehaveLikeERC20Approve (errorPrefix, _owner, _spender, supply, approve) {
