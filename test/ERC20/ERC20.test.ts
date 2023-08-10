@@ -14,6 +14,7 @@ const { expectEvent } = require('./helpers')
 const { expect } = require('chai');
 const expectRevert = async (f, msg) => { await expect(f).rejectedWith(msg) }
 const { BigNumber } = ethers
+const ZERO_ADDRESS = ethers.constants.AddressZero
 
 const {
   shouldBehaveLikeERC20,
@@ -282,13 +283,11 @@ describe('ERC20', () => {
 
   describe('_mint', function () {
     const amount = BigNumber.from(50);
-    /* // null checks not part of spec
     it('rejects a null account', async function () {
       await expectRevert(
-        this.token.mint(ZERO_ADDRESS, amount), 'VM Exception while processing transaction: revert unimplemented',
+        this.token.mint(ZERO_ADDRESS, amount), 'ErrZeroDst()',
       );
     });
-    */
 
     describe('for a non zero account', function () {
       beforeEach('minting', async function () {
@@ -316,12 +315,11 @@ describe('ERC20', () => {
   });
 
   describe('_burn', function () {
-    /* // null checks not part of spec
     it('rejects a null account', async function () {
-      await expectRevert(this.token.burn(ZERO_ADDRESS, new BN(1)),
-        'ERC20: burn from the zero address');
+      // difference from OZ: underflow because nothing can be minted there either
+      await expectRevert(this.token.burn(ZERO_ADDRESS, BigNumber.from(1)),
+        'ErrUnderflow()');
     });
-    */
 
     describe('for a non zero account', function () {
       it('rejects burning more than balance', async function () {

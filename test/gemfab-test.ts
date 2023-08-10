@@ -348,5 +348,4 @@ describe('gemfab', () => {
     const gem2_code = await ethers.provider.getCode(gem2.address);
     want(gem_code).eq(gem2_code);
   })
-
 })
