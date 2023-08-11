@@ -25,6 +25,13 @@ export default {
             mnemonic: process.env["ARB_GOERLI_MNEMONIC"]
           },
           chainId: 421613
+      },
+      arbitrum: {
+          url: process.env["ARB_RPC_URL"],
+          accounts: {
+            mnemonic: process.env["ARB_MNEMONIC"]
+          },
+          chainId: 42161
       }
   }
 }

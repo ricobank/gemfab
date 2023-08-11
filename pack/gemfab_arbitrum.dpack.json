@@ -1,0 +1,28 @@
+{
+  "format": "dpack-1",
+  "network": "arbitrum",
+  "types": {
+    "GemFab": {
+      "typename": "GemFab",
+      "artifact": {
+        "/": "bafybeieqk4jnp6563jimucrc63k7azpcg73l5e5xierhrylzxtqw5xcfly"
+      }
+    },
+    "Gem": {
+      "typename": "Gem",
+      "artifact": {
+        "/": "bafybeif5qyd3w4a3j5s2xzocrrt7ppic67rb4v73sjwxqutnnnowbzi2xq"
+      }
+    }
+  },
+  "objects": {
+    "gemfab": {
+      "objectname": "gemfab",
+      "typename": "GemFab",
+      "artifact": {
+        "/": "bafybeieqk4jnp6563jimucrc63k7azpcg73l5e5xierhrylzxtqw5xcfly"
+      },
+      "address": "0x936BA9c976558CE2957D4283439C60d86B953af0"
+    }
+  }
+}
