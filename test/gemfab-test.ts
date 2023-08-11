@@ -1,6 +1,6 @@
 import * as hh from 'hardhat'
 import { ethers, artifacts, network } from 'hardhat'
-import { want, send, fail, snapshot, revert } from 'minihat'
+import { want, send, fail, snapshot, revert, b32 } from 'minihat'
 const { constants, BigNumber, utils } = ethers
 
 import { test1D, test2D } from './helpers'
@@ -45,7 +45,10 @@ describe('gemfab', () => {
     const name = utils.formatBytes32String('Mock Cash');
     const symbol = utils.formatBytes32String('CASH');
     const gemaddr = await gemfab.callStatic.build(name, symbol)
-    await send(gemfab.build, name, symbol)
+    const rx = await send(gemfab.build, name, symbol)
+    expectEvent(rx, 'Build', {caller: ALI, gem: gemaddr})
+    want(await gemfab.built(gemaddr)).true
+
     gem = gem_type.attach(gemaddr)
 
     await snapshot(hh)
@@ -83,6 +86,11 @@ describe('gemfab', () => {
     const alibob = gem.connect(ali)
     await fail('ErrUnderflow', alibob.transferFrom, BOB, BOB, balbob + 1);
   });
+
+  it('transfer self insufficient bal', async () => {
+      await send(gem.mint, ALI, 100);
+      await fail('ErrUnderflow', gem.transfer, ALI, await gem.balanceOf(ALI) + 1)
+  })
 
   it('transferFrom self sufficient bal', async () => {
     await send(gem.mint, BOB, 100);
