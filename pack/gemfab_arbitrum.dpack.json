@@ -5,13 +5,13 @@
     "GemFab": {
       "typename": "GemFab",
       "artifact": {
-        "/": "bafybeieqk4jnp6563jimucrc63k7azpcg73l5e5xierhrylzxtqw5xcfly"
+        "/": "bafybeid4zujx6upnggnf3kbvhkymqzs4jercf2yiypyg662alvxkytgm4y"
       }
     },
     "Gem": {
       "typename": "Gem",
       "artifact": {
-        "/": "bafybeif5qyd3w4a3j5s2xzocrrt7ppic67rb4v73sjwxqutnnnowbzi2xq"
+        "/": "bafybeiey7wh7j53xcmogh5kzy4tdrgvbfm3omyehbts5op5t7ay3w4vmsu"
       }
     }
   },
@@ -20,9 +20,9 @@
       "objectname": "gemfab",
       "typename": "GemFab",
       "artifact": {
-        "/": "bafybeieqk4jnp6563jimucrc63k7azpcg73l5e5xierhrylzxtqw5xcfly"
+        "/": "bafybeid4zujx6upnggnf3kbvhkymqzs4jercf2yiypyg662alvxkytgm4y"
       },
-      "address": "0x936BA9c976558CE2957D4283439C60d86B953af0"
+      "address": "0x5C635933743B93BC1C51B4798C984867Fc31BFC7"
     }
   }
 }
