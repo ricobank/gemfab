@@ -10,6 +10,8 @@ import { TypedDataUtils } from 'ethers-eip712'
 
 const { expectEvent } = require('./ERC20/helpers')
 
+const dpack = require('@etherpacks/dpack')
+
 const debug = require('debug')('gemfab:test')
 
 const types = {
@@ -41,7 +43,10 @@ describe('gemfab', () => {
     gem_type = await ethers.getContractFactory('Gem', ali)
     gemfab_type = await ethers.getContractFactory('GemFab', ali)
 
-    gemfab = await gemfab_type.deploy()
+    const pack = await hh.run('deploy-gemfab', {writepack: 'true'})
+    const dapp = await dpack.load(pack, ethers, ali)
+
+    gemfab = dapp.gemfab
     const name = utils.formatBytes32String('Mock Cash');
     const symbol = utils.formatBytes32String('CASH');
     const gemaddr = await gemfab.callStatic.build(name, symbol)
