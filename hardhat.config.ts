@@ -15,7 +15,16 @@ export default {
       optimizer: {
         enabled: true,
         runs: 20000
-      }
+      },
     }
+  },
+  networks: {
+      arbitrum_goerli: {
+          url: process.env["ARB_GOERLI_RPC_URL"],
+          accounts: {
+            mnemonic: process.env["ARB_GOERLI_MNEMONIC"]
+          },
+          chainId: 421613
+      }
   }
 }
