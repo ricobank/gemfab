@@ -112,7 +112,7 @@ contract Gem {
             balanceOf[dst]       += wad;
             emit Transfer(msg.sender, dst, wad);
 
-            if( prev < wad ) revert ErrUnderflow();
+            if (prev < wad) revert ErrUnderflow();
             if (dst == address(0)) revert ErrZeroDst();
         }
     }
@@ -127,15 +127,15 @@ contract Gem {
             balanceOf[dst] += wad;
             uint256 prevA   = allowance[src][msg.sender];
 
-            if ( prevA != type(uint256).max ) {
+            if (prevA != type(uint256).max) {
                 allowance[src][msg.sender] = prevA - wad;
                 emit Approval(src, msg.sender, prevA - wad);
 
-                if( prevA < wad ) revert ErrUnderflow();
+                if (prevA < wad) revert ErrUnderflow();
             }
             emit Transfer(src, dst, wad);
 
-            if( prevB < wad ) revert ErrUnderflow();
+            if (prevB < wad) revert ErrUnderflow();
             if (dst == address(0)) revert ErrZeroDst();
         }
     }
@@ -184,10 +184,10 @@ contract GemFab {
       payable external returns (Gem gem)
     {
         gem = new Gem(name, symbol);
-        gem.ward(msg.sender, true);
-        gem.ward(address(this), false);
         built[address(gem)] = true;
         emit Build(msg.sender, address(gem));
+        gem.ward(msg.sender, true);
+        gem.ward(address(this), false);
         return gem;
     }
 }
