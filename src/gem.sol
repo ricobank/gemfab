@@ -28,10 +28,10 @@ contract Gem {
     mapping (address => uint)                      public nonces;
     mapping (address => bool)                      public wards;
 
-    bytes32 immutable DOMAIN_SUBHASH = keccak256(
+    bytes32 constant DOMAIN_SUBHASH = keccak256(
         'EIP712Domain(string name,string version,uint256 chainId,address verifyingContract)'
     );
-    bytes32 immutable PERMIT_TYPEHASH = keccak256(
+    bytes32 constant PERMIT_TYPEHASH = keccak256(
         'Permit(address owner,address spender,uint256 value,uint256 nonce,uint256 deadline)'
     );
     function DOMAIN_SEPARATOR() external view returns (bytes32) {
@@ -74,18 +74,16 @@ contract Gem {
       payable external
     {
         if (!wards[msg.sender]) revert ErrWard();
-        // only need to check totalSupply for overflow
         unchecked {
+            // only need to check totalSupply for overflow
             uint256 prev = totalSupply;
-            if (prev + wad < prev) {
-                revert ErrOverflow();
-            }
+            if (prev + wad < prev) revert ErrOverflow();
+
             balanceOf[usr] += wad;
             totalSupply     = prev + wad;
             emit Transfer(address(0), usr, wad);
-            if (usr == address(0)) {
-                revert ErrZeroDst();
-            }
+
+            if (usr == address(0)) revert ErrZeroDst();
         }
     }
 
@@ -93,15 +91,14 @@ contract Gem {
       payable external
     {
         if (!wards[msg.sender]) revert ErrWard();
-        // only need to check balanceOf[usr] for underflow
         unchecked {
+            // only need to check balanceOf[usr] for underflow
             uint256 prev = balanceOf[usr];
             balanceOf[usr] = prev - wad;
             totalSupply    -= wad;
             emit Transfer(usr, address(0), wad);
-            if (prev < wad) {
-                revert ErrUnderflow();
-            }
+
+            if (prev < wad) revert ErrUnderflow();
         }
     }
 
@@ -114,12 +111,9 @@ contract Gem {
             balanceOf[msg.sender] = prev - wad;
             balanceOf[dst]       += wad;
             emit Transfer(msg.sender, dst, wad);
-            if( prev < wad ) {
-                revert ErrUnderflow();
-            }
-            if (dst == address(0)) {
-                revert ErrZeroDst();
-            }
+
+            if( prev < wad ) revert ErrUnderflow();
+            if (dst == address(0)) revert ErrZeroDst();
         }
     }
 
@@ -136,18 +130,13 @@ contract Gem {
             if ( prevA != type(uint256).max ) {
                 allowance[src][msg.sender] = prevA - wad;
                 emit Approval(src, msg.sender, prevA - wad);
-                if( prevA < wad ) {
-                    revert ErrUnderflow();
-                }
+
+                if( prevA < wad ) revert ErrUnderflow();
             }
             emit Transfer(src, dst, wad);
 
-            if( prevB < wad ) {
-                revert ErrUnderflow();
-            }
-            if (dst == address(0)) {
-                revert ErrZeroDst();
-            }
+            if( prevB < wad ) revert ErrUnderflow();
+            if (dst == address(0)) revert ErrZeroDst();
         }
     }
 
@@ -166,6 +155,7 @@ contract Gem {
     {
         allowance[owner][spender] = value;
         emit Approval(owner, spender, value);
+
         address signer;
         unchecked {
             signer = ecrecover(
@@ -178,9 +168,10 @@ contract Gem {
                 v, r, s
             );
         }
-        if (signer == address(0)) { revert ErrPermitSignature(); }
-        if (owner != signer) { revert ErrPermitSignature(); }
-        if (block.timestamp > deadline) { revert ErrPermitDeadline(); }
+
+        if (signer == address(0)) revert ErrPermitSignature();
+        if (owner != signer) revert ErrPermitSignature();
+        if (block.timestamp > deadline) revert ErrPermitDeadline();
     }
 }
 
