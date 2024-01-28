@@ -32,6 +32,13 @@ export default {
             mnemonic: process.env["ARB_MNEMONIC"]
           },
           chainId: 42161
+      },
+      arbitrum_sepolia: {
+          url: process.env["ARB_SEPOLIA_RPC_URL"],
+          accounts: {
+            mnemonic: process.env["ARB_SEPOLIA_MNEMONIC"]
+          },
+          chainId: 421614
       }
   }
 }
