@@ -6,7 +6,7 @@ const { task } = require('hardhat/config')
 
 task('deploy-gemfab', 'deploy GemFab')
   .addFlag('stdout', 'print the dpack to stdout')
-  .addOptionalParam('outfile', 'save the dpack to this path')
+  .addOptionalParam('writepack', 'save the pack')
   .addOptionalParam('gasLimit', 'gemfab deploy tx gas limit')
   .setAction(async (args, hre) => {
     const { ethers, network } = hre
@@ -40,8 +40,12 @@ task('deploy-gemfab', 'deploy GemFab')
     if (args.stdout) {
         console.log(str)
     }
-    if (args.outfile) {
-        require('fs').writeFileSync(args.outfile, str)
+    if (args.writepack) {
+        const outfile = require('path').join(
+            __dirname, `../pack/gemfab_${hre.network.name}.dpack.json`
+        )
+        const packstr = JSON.stringify(pack, null, 2)
+        require('fs').writeFileSync(outfile, packstr)
     }
     return pack
   })
