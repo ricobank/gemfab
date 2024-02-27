@@ -31,3 +31,10 @@ Discussion
 
 "ERC20" is an ABI definition masquerading as a semantic spec. There is no "standard ERC20".
 As a result, the token ecosystem is a disaster. In an ideal world, this would have been the lesson that taught EIP enthusiasts to stop doing design by committee.
+
+Packs
+---
+Arbitrum One bafkreibhkoqc5nda6dlubyvsylethk5nxqynjltnsxnlmpc7inpcmiveom
+Sepolia
+Arbitrum Sepolia bafybeigm6cpsg4jfnh3sqezpcp77i7ted4hawmj2bybqsqgh24ot7aijva
+Arbitrum Goerli bafybeifbn66p32bgd36kgf5xg67fthdyjhywfywjwwg357xnlvgxr4ne5a
