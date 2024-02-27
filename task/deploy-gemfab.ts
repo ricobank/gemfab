@@ -1,4 +1,5 @@
-const debug = require('debug')('gemfab:task')
+import Debug from 'debug'
+const debug = Debug('gemfab:task')
 
 const dpack = require('@etherpacks/dpack')
 
