@@ -1,6 +1,6 @@
 /// SPDX-License-Identifier: AGPL-3.0-only
 
-// Copyright (C) 2021 kevin and his friends
+// Copyright (C) 2024 Free Software Foundation, in memoriam of Nikolai Mushegian
 // Copyright (C) 2017, 2018, 2019 dbrock, rain, mrchico
 
 // This program is free software: you can redistribute it and/or modify

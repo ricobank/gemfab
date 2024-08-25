@@ -38,3 +38,7 @@ Arbitrum One bafkreibhkoqc5nda6dlubyvsylethk5nxqynjltnsxnlmpc7inpcmiveom
 Sepolia
 Arbitrum Sepolia bafybeigm6cpsg4jfnh3sqezpcp77i7ted4hawmj2bybqsqgh24ot7aijva
 Arbitrum Goerli bafybeifbn66p32bgd36kgf5xg67fthdyjhywfywjwwg357xnlvgxr4ne5a
+
+### Notice
+
+See NOTICE file for copyrights and credits.
